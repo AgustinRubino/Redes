@@ -426,7 +426,7 @@ WheelCollider:
     targetPosition: 0.5
   m_SuspensionDistance: 0.3
   m_ForceAppPointDistance: 0
-  m_Mass: 20
+  m_Mass: 1000
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
     m_ExtremumSlip: 0.4
@@ -463,7 +463,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wheelModel: {fileID: 924814688}
   WheelCollider: {fileID: 0}
-  steerable: 0
+  steerable: 1
   motorized: 1
 --- !u!1 &426658807
 GameObject:
@@ -656,7 +656,7 @@ WheelCollider:
     targetPosition: 0.5
   m_SuspensionDistance: 0.3
   m_ForceAppPointDistance: 0
-  m_Mass: 20
+  m_Mass: 1000
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
     m_ExtremumSlip: 0.4
@@ -693,7 +693,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wheelModel: {fileID: 1518839424}
   WheelCollider: {fileID: 0}
-  steerable: 0
+  steerable: 1
   motorized: 1
 --- !u!4 &535640701 stripped
 Transform:
@@ -749,7 +749,7 @@ WheelCollider:
     targetPosition: 0.5
   m_SuspensionDistance: 0.3
   m_ForceAppPointDistance: 0
-  m_Mass: 20
+  m_Mass: 1000
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
     m_ExtremumSlip: 0.4
@@ -913,6 +913,7 @@ GameObject:
   - component: {fileID: 1002394460}
   - component: {fileID: 1002394462}
   - component: {fileID: 1002394461}
+  - component: {fileID: 1002394463}
   m_Layer: 0
   m_Name: Car 2
   m_TagString: Untagged
@@ -944,20 +945,21 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1002394459}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 24217d5b94ddf88418e5080a7c98d307, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _body: {fileID: 1002394462}
+  _maxSpeed: 100
+  _acceleration: 75
+  _deacceleration: 40
+  _breakForce: 100
+  _steerRotation: 0.1
+  _steeringForce: {x: 125, y: 30}
   _speed: 0
-  _maxSpeed: 40
-  _acceleration: 25
-  _deacceleration: 10
-  _breakForce: 35
-  _maxSteering: 30
-  _steeringForce: {x: 0, y: 0}
   _steering: 0
+  _currentRotation: 0
   <Direction>k__BackingField: {x: 0, y: 0, z: 0}
 --- !u!54 &1002394462
 Rigidbody:
@@ -986,6 +988,32 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &1002394463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002394459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea6dec0cd07b96b469f7b45e7263b08b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _body: {fileID: 1002394462}
+  _view: {fileID: 1046259216}
+  _maxSpeed: 100
+  _acceleration: 75
+  _deacceleration: 40
+  _breakForce: 100
+  _steerRotation: 0.1
+  _steeringForce: {x: 125, y: 30}
+  _speed: 0
+  _steering: 0
+  _currentRotation: 0
+  _moveDirection: 0
+  _targetVelocity: {x: 0, y: 0, z: 0}
+  <Direction>k__BackingField: {x: 0, y: 0, z: 0}
 --- !u!4 &1046259216 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1722599251777355586, guid: 93aa2fdb460ba3c4fbf158d912d360d6, type: 3}
@@ -1401,7 +1429,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1491478817}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 4461fd916eb67574ea9fa935ba565715, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1428,9 +1456,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c85f4a26e5e3d9740bca107ed1167a32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  motorTorque: 2000
+  motorTorque: 500
   brakeTorque: 4000
-  maxSpeed: 20
+  maxSpeed: 10000000
   steeringRange: 60
   steeringRangeAtMaxSpeed: 10
   centreOfGravityOffset: -1
@@ -1488,7 +1516,7 @@ WheelCollider:
     targetPosition: 0.5
   m_SuspensionDistance: 0.3
   m_ForceAppPointDistance: 0
-  m_Mass: 20
+  m_Mass: 1000
   m_WheelDampingRate: 0.25
   m_ForwardFriction:
     m_ExtremumSlip: 0.4
