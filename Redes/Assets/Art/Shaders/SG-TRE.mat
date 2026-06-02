@@ -47,8 +47,8 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - _Color1: {r: 0.53741586, g: 0.9433962, b: 0.43164828, a: 0}
-    - _Color2: {r: 0.23762906, g: 0.5660378, b: 0.49376145, a: 0}
+    - _Color1: {r: 0.66678005, g: 0.4669811, b: 1, a: 0}
+    - _Color2: {r: 0.4830712, g: 0.23921566, b: 0.5647059, a: 0}
     - _MovimientoDeVrisa: {r: 6, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
