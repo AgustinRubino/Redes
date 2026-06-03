@@ -65,7 +65,7 @@ public class CarControl : MonoBehaviour
                 // Apply torque to Wheel colliders that have "Motorized" enabled
                 if (wheel.motorized)
                 {
-                    wheel.WheelCollider.motorTorque = vInput * currentMotorTorque;
+                    wheel.WheelCollider.motorTorque = vInput * motorTorque;
                 }
                 wheel.WheelCollider.brakeTorque = 0;
             }

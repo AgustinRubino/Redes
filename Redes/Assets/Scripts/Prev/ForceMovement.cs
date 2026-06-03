@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System;
 
-public class ForceMovement  : MonoBehaviour
+public class ForceMovement : MonoBehaviour
 {
     [SerializeField] Rigidbody _body;
     [SerializeField] Transform _view;
@@ -16,6 +16,7 @@ public class ForceMovement  : MonoBehaviour
     [Header("Steering")]
     [SerializeField] float _steerRotation = 0.1f;
     [SerializeField] Vector2 _steeringForce;
+    [SerializeField] LayerMask _gronud;
 
     [Header("Result Values")]
     [SerializeField] float _speed;
@@ -25,6 +26,8 @@ public class ForceMovement  : MonoBehaviour
     [SerializeField] Vector3 _targetVelocity;
 
     [field: SerializeField] public Vector3 Direction { get; private set; }
+
+    bool _isHitted;
 
     float _inputV;
     float _inputH;
@@ -39,9 +42,18 @@ public class ForceMovement  : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!IsGrounded) return;
         SetVariables();
-        Rotate();
-        Move();
+        if (!_isHitted)
+        {
+            HandleSteering();
+            HandleAcceleration();
+        }
+        else
+        {
+            if (_speed < 0.4f)
+                _isHitted = false;
+        }
         //_view.forward = _body.linearVelocity;
     }
 
@@ -52,22 +64,22 @@ public class ForceMovement  : MonoBehaviour
 
         _moveDirection = MathF.Sign(Vector3.Dot(transform.forward, _body.linearVelocity));
     }
-    private void Move()
+    private void HandleAcceleration()
     {
         bool isAccelerating = _moveDirection == MathF.Sign(_inputV);
 
         if (_inputV != 0)
         {
-            if (isAccelerating || _speed == 0) Accelerate();
+            if (isAccelerating || _speed  < 0.05f) Accelerate();
             else Breaking();
         }
         else if (_speed > 0) Deaccelerate();
     }
 
-    private void Rotate()
+    private void HandleSteering()
     {
         var speed = Mathf.Abs(_speed) / _maxSpeed;
-        var targetRotation =  _moveDirection * Mathf.Lerp(_steeringForce.x * speed, _steeringForce.y, speed);
+        var targetRotation = _moveDirection * Mathf.Lerp(_steeringForce.x * speed, _steeringForce.y, speed);
         _currentRotation = Mathf.Lerp(_currentRotation, _inputH * targetRotation, _steerRotation);
         _currentRotation = Mathf.Abs(_currentRotation) < 0.05f ? 0 : _currentRotation;
 
@@ -84,6 +96,8 @@ public class ForceMovement  : MonoBehaviour
 
     }
 
+    public bool IsGrounded => Physics.Raycast(transform.position + Vector3.up * 0.1f, -transform.up, 0.2f, _gronud);
+
     private void Breaking()
     {
         if (_speed < 0.05f) return;
@@ -93,9 +107,7 @@ public class ForceMovement  : MonoBehaviour
     private void Accelerate()
     {
         if (_speed > _maxSpeed) return;
-        Debug.Log($"prev: {_body.linearVelocity} + {transform.forward * _acceleration * _inputV * _body.mass}");
         _body.AddForce(transform.forward *  _acceleration * _inputV * _body.mass);
-        Debug.Log($"next: {_body.linearVelocity}");
 
         //Debug.Log("Accelerate");
         //speed = speed + Mathf.Sign(_inputV) * _acceleration * Time.fixedDeltaTime;
@@ -111,6 +123,12 @@ public class ForceMovement  : MonoBehaviour
         _body.AddForce(-_body.linearVelocity.normalized  * _deacceleration, ForceMode.Acceleration);
     }
 
+
+    public void GetHit(Vector3 position, Vector3 force)
+    {
+        _body.AddForceAtPosition(force, position, ForceMode.Impulse);
+        _isHitted = true;
+    }
     private void OnDrawGizmos()
     {
         Gizmos.DrawLine(transform.position, transform.position + _body.linearVelocity);
