@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class PlayerManager : SimulationBehaviour, IPlayerJoined
 {
+    public static event Action OnPlayerJoined;
+
     public GameObject PlayerPrefab;
     public GameObject cameraPivot;
     public int maxPlayers = 5;
@@ -19,6 +21,8 @@ public class PlayerManager : SimulationBehaviour, IPlayerJoined
     {
         if (player == Runner.LocalPlayer)
         {
+            OnPlayerJoined?.Invoke();
+
             var car = Runner.Spawn(PlayerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
             SetPlayer(car.GetComponent<CarModel>(), Runner.SessionInfo.PlayerCount -1);
         }
