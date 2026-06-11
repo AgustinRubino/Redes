@@ -37,6 +37,8 @@ public class ForceMovement : NetworkBehaviour
     [SerializeField] Vector3 _targetVelocity;
     [SerializeField] float _dashTimer;
 
+    public float Speed => _speed;
+
     [field: SerializeField] public Vector3 Direction { get; private set; }
 
     bool _isHitted;
