@@ -5,9 +5,11 @@ public class SpeedMeter : MonoBehaviour
 {
     [SerializeField] TMP_Text _text;
     ForceMovement _movement;
+
+
     private void OnEnable()
     {
-        _movement = PlayerManager.Instance.localPlayerModel.movement;
+        _movement = PlayerModel.LocalPlayer.movement;
     }
 
     private void FixedUpdate()
