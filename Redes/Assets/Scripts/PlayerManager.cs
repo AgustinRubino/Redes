@@ -9,26 +9,24 @@ public class PlayerManager : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 
     public GameObject PlayerPrefab;
 
-    public GameObject cameraPivot;
     public GameObject cameraPrefab;
-    public int maxPlayers = 5;
+    public GameObject cameraPivot;
+    public GameObject carCamera;
+
     public PlayerInfo[] playerInfo;
 
     public PlayerModel localPlayerModel;
 
+
     public static PlayerManager Instance { get; private set; }
 
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-    }
-
-    void IPlayerJoined.PlayerJoined(PlayerRef player)
+    public void PlayerJoined(PlayerRef player)
     {
         if (player == Runner.LocalPlayer)
         {
             OnPlayerJoined?.Invoke();
+            Instance = this;
+            GameManager.OnGameStateChanged += OnGameStateChanged;
 
             var car = Runner.Spawn(PlayerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
             localPlayerModel = car.GetComponent<PlayerModel>();
@@ -48,13 +46,33 @@ public class PlayerManager : SimulationBehaviour, IPlayerJoined, IPlayerLeft
         model.SetPosition(info.position.position);
         model.SetRotation(info.position.rotation);
 
-        Instantiate(cameraPrefab, model.transform);
-        cameraPivot.SetActive(false);
+        if (GameManager.Instance != null)
+            OnGameStateChanged(GameManager.Instance.GameState);
     }
 
     public void PlayerLeft(PlayerRef player)
     {
         //throw new NotImplementedException();
+    }
+
+    private void OnGameStateChanged(EGameState state)
+    {
+        if (state == EGameState.WaitingPlayers || state == EGameState.Countdown) SetPivotCamera();
+        else SetGameCamera();
+    }
+    public void SetPivotCamera()
+    {
+        cameraPivot.SetActive(true);
+        if (carCamera != null) carCamera.SetActive(false);
+    }
+    private void SetGameCamera()
+    {
+        if (carCamera == null)
+        {
+            carCamera = Instantiate(cameraPrefab, localPlayerModel.transform);
+        }
+        carCamera.SetActive(true);
+        cameraPivot.SetActive(false);
     }
 
     [Serializable]

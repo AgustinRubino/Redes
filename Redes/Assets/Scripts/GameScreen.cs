@@ -1,17 +1,41 @@
 using UnityEngine;
+using Fusion;
+using System;
 
 public class GameScreen : MonoBehaviour
 {
-    // Start is called once before the first
-    // execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] GameObject _waitMenu;
+    [SerializeField] GameObject _countdownMenu;
+    [SerializeField] GameObject _raceMenu;
+
+    public void OnEnable()
     {
-        
+        GameManager.OnGameStateChanged += ChangeState;
+}
+    public void OnDisable()
+    {
+        GameManager.OnGameStateChanged -= ChangeState;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void ChangeState(EGameState state)
     {
-        
+        switch (state)
+        {
+            case EGameState.WaitingPlayers:
+                _waitMenu.SetActive(true);
+                _countdownMenu.SetActive(false);
+                _raceMenu.SetActive(false);
+                break;
+            case EGameState.Countdown:
+                _waitMenu.SetActive(false);
+                _countdownMenu.SetActive(true);
+                _raceMenu.SetActive(false);
+                break;
+            case EGameState.Racing:
+                _waitMenu.SetActive(false);
+                _raceMenu.SetActive(true);
+                break;
+        }
     }
 }
+

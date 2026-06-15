@@ -2,124 +2,104 @@ using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class GameManager : SimulationBehaviour, INetworkRunnerCallbacks
+public class GameManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
 {
     public static event Action<PlayerRef> OnPlayerJoinedEvent;
     public static event Action<PlayerRef> OnPlayerLeftEvent;
-    public static GameManager Instance { get; private set;  }
+    public static event Action<PlayerRef> OnPlayerWinEvent;
+    public static event Action<EGameState> OnGameStateChanged;
 
+    public static GameManager Instance { get; private set; }
 
-    public enum GameState { Waiting, Preparing, Playing, Finishing };
+    [Networked, OnChangedRender(nameof(OnGameStateChangeRender))]
+    public EGameState GameState { get; private set; }
 
-    public void OnConnectedToServer(NetworkRunner runner)
+    [Header("Player Preferences")]
+    [SerializeField] int _minPlayers = 2;
+    [SerializeField] int _maxPlayers = 6;
+    [SerializeField] int _startCounterTime = 10;
+    [SerializeField] int _maxPlayersBeforeEndGame = 3;
+    [Space(20), Header("References")]
+    [SerializeField] public FlagManager flagManager;
+    [SerializeField] public NetworkStartCounter startCounter;
+
+    List<PlayerRef> _winners = new();
+
+    public override void Spawned()
     {
-        //throw new NotImplementedException();
+        _winners = new();
+        flagManager.OnPlayerCompleteTrack += OnPlayerWin;
+        startCounter.OnFinishCounter += CounterFinished;
     }
 
-    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
+    private void CounterFinished()
     {
-        //throw new NotImplementedException();
+        if (GameState == EGameState.Countdown)
+        {
+            GameState = EGameState.Racing;
+        }
     }
 
-    public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
+    private void OnPlayerWin(PlayerRef player)
     {
-        //throw new NotImplementedException();
+        if (_winners.Contains(player)) return;
+        _winners.Add(player);
+
+        if (_winners.Count < _maxPlayersBeforeEndGame) return;
+
+        GameState = EGameState.Finishing;
     }
 
-    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
-    {
-        //throw new NotImplementedException();
-    }
 
-    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
+    public void PlayerJoined(PlayerRef player)
     {
-        //throw new NotImplementedException();
-    }
-
-    public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
-    {
-        //throw new NotImplementedException();
-    }
-
-    public void OnInput(NetworkRunner runner, NetworkInput input)
-    {
-        //throw new NotImplementedException();
-    }
-
-    public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
-    {
-        //throw new NotImplementedException();
-    }
-
-    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-    {
-        //throw new NotImplementedException();
-    }
-
-    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-    {
-        //throw new NotImplementedException();
-    }
-
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-    {
+        CheckForPlayersCount(Runner);
         OnPlayerJoinedEvent?.Invoke(player);
     }
 
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    public void PlayerLeft(PlayerRef player)
     {
+        if (Instance == this && player == Runner.LocalPlayer)
+            Instance = null;
+
+        CheckForPlayersCount(Runner);
         OnPlayerLeftEvent?.Invoke(player);
     }
-
-    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
+    private void CheckForPlayersCount(NetworkRunner runner)
     {
-        //throw new NotImplementedException();
+        if (!Object.HasStateAuthority) return; 
+
+        if (GameState == EGameState.Finishing)
+        {
+            return;
+        }
+        int count = runner.ActivePlayers.Count();
+
+        if (GameState == EGameState.Countdown && count < _minPlayers)
+        {
+            GameState = EGameState.WaitingPlayers;
+        }
+        else if (GameState == EGameState.WaitingPlayers && count >= _minPlayers)
+        {
+            GameState = EGameState.Countdown;
+        }
     }
 
-    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data)
+    private void OnGameStateChangeRender()
     {
-        //throw new NotImplementedException();
-    }
+        Debug.Log($"Player{Runner.LocalPlayer} change to {GameState}");
+        OnGameStateChanged?.Invoke(GameState);
 
-    public void OnSceneLoadDone(NetworkRunner runner)
+        if (GameState == EGameState.Countdown)
+            startCounter.StartCounter(_startCounterTime);
+    }
+    private void Awake()
     {
-        //throw new NotImplementedException();
+        Instance = this;
     }
-
-    public void OnSceneLoadStart(NetworkRunner runner)
-    {
-        //throw new NotImplementedException();
-    }
-
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
-    {
-        //throw new NotImplementedException();
-    }
-
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
-    {
-        //throw new NotImplementedException();
-    }
-
-    public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
-    {
-        //throw new NotImplementedException();
-    }
-
-    //private void Awake()
-    //{
-    //    if (Instance == null)
-    //        Instance = this;
-    //    else Destroy(gameObject);
-    //}
-
-    //private void OnDestroy()
-    //{
-    //    if (Instance == this)
-    //        Instance = null;
-    //}
-
-    
 }
+
+public enum EGameState { WaitingPlayers, Countdown, Racing, Finishing };

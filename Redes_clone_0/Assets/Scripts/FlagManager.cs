@@ -14,18 +14,17 @@ public class FlagManager : NetworkBehaviour
     [SerializeField] Flag[] _flags;
     [SerializeField] int _currentIndex = 0;
 
-
     public void Start()
     {
         if (_flags == null || _flags.Length == 0)
         {
             _flags = GetComponentsInChildren<Flag>();
-        } 
+        }
         _currentIndex = -1;
         ActivateNextFlag();
     }
 
-    
+
     private void ActivateNextFlag()
     {
         if (_currentIndex >= 0)
@@ -33,13 +32,12 @@ public class FlagManager : NetworkBehaviour
             _flags[_currentIndex].Deactivate();
             _flags[_currentIndex].OnFlagPassed -= ActivateNextFlag;
             //Debug.Log($"Player {Runner.LocalPlayer} passed flag {_currentIndex}!");
-            OnPlayerPassedFlag?.Invoke(_currentIndex, Runner.LocalPlayer);
+            RPC_PlayerPassedFlag(_currentIndex, Runner.LocalPlayer);
         }
         _currentIndex++;
         if (_currentIndex >= _flags.Length)
         {
-            Debug.Log($"Player {Runner.LocalPlayer} wins!");
-            OnPlayerCompleteTrack?.Invoke(Runner.LocalPlayer);
+            RPC_PlayerCompletedTrack(Runner.LocalPlayer);
             return;
         }
 
@@ -47,5 +45,17 @@ public class FlagManager : NetworkBehaviour
         _flags[_currentIndex].OnFlagPassed += ActivateNextFlag;
     }
 
-    
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_PlayerPassedFlag(int index, PlayerRef player)
+    {
+        Debug.Log($"Player {player} passed flag {index}");
+        OnPlayerPassedFlag?.Invoke(index, player);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_PlayerCompletedTrack(PlayerRef player)
+    {
+        Debug.Log($"Player {player} wins!");
+        OnPlayerCompleteTrack?.Invoke(player);
+    }
 }

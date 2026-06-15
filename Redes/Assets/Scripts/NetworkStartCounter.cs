@@ -10,14 +10,21 @@ public class NetworkStartCounter : NetworkBehaviour
 
 
     [Networked, SerializeField] public bool IsActive { get; private set; }
-    [SerializeField] int _time = 0;
-    [SerializeField] float _timer = 0;
+    [Networked] public TickTimer Timer { get; private set; }
+
+    [Networked, OnChangedRender(nameof(ChangeTimeLeft))]
+    [SerializeField] int TimeLeft { get; set; }
+
+    private void ChangeTimeLeft()
+    {
+        OnCounterChange?.Invoke(TimeLeft);
+    }
 
     public void StartCounter(int value)
     {
         IsActive = true;
-        _time = value;
-        _timer = value;
+        Timer = TickTimer.CreateFromSeconds(Runner, value);
+        TimeLeft = value;
 
         OnStartCounter?.Invoke();
     }
@@ -26,18 +33,21 @@ public class NetworkStartCounter : NetworkBehaviour
     {
         if (!IsActive) return;
 
-        _timer -= Time.deltaTime;
-
-        if ( _timer < _time)
+        if (Timer.Expired(Runner))
         {
-            _time = _timer.CeilToInt();
-            OnCounterChange?.Invoke(_time);
-        }
-
-        if (_timer < 0)
-        {
+            Timer = TickTimer.None;
             IsActive = false;
-            OnFinishCounter?.Invoke();
+            RPC_CounterFinished();
         }
+
+        if (Timer.RemainingTime(Runner) < TimeLeft)
+        {
+            TimeLeft -= 1;
+        }
+    }
+
+    private void RPC_CounterFinished()
+    {
+        OnFinishCounter?.Invoke();
+    }
 }
-}}
