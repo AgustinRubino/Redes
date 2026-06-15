@@ -30,20 +30,26 @@ public class GameManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
 
     public override void Spawned()
     {
+        SingletonManager.Instance.Runner = Runner;
+
         _winners = new();
         flagManager.OnPlayerCompleteTrack += OnPlayerWin;
         startCounter.OnFinishCounter += CounterFinished;
+
+        OnGameStateChanged?.Invoke(GameState);
     }
 
     private void CounterFinished()
     {
+        if (!HasStateAuthority) return;
         if (GameState == EGameState.Countdown)
         {
             GameState = EGameState.Racing;
         }
     }
 
-    private void OnPlayerWin(PlayerRef player)
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_OnPlayerWin(PlayerRef player)
     {
         if (_winners.Contains(player)) return;
         _winners.Add(player);
@@ -53,15 +59,22 @@ public class GameManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
         GameState = EGameState.Finishing;
     }
 
+    private void OnPlayerWin(PlayerRef player)
+    {
+        RPC_OnPlayerWin(player);
+    }
+
 
     public void PlayerJoined(PlayerRef player)
     {
+        if (!HasStateAuthority) return;
         CheckForPlayersCount(Runner);
         OnPlayerJoinedEvent?.Invoke(player);
     }
 
     public void PlayerLeft(PlayerRef player)
     {
+        if (!HasStateAuthority) return;
         if (Instance == this && player == Runner.LocalPlayer)
             Instance = null;
 
@@ -70,8 +83,6 @@ public class GameManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
     }
     private void CheckForPlayersCount(NetworkRunner runner)
     {
-        if (!Object.HasStateAuthority) return; 
-
         if (GameState == EGameState.Finishing)
         {
             return;

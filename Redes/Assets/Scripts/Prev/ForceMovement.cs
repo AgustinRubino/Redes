@@ -166,10 +166,6 @@ public class ForceMovement : NetworkBehaviour
     {
         if (_speed > _maxSpeed) return;
         _body.Rigidbody.AddForce(transform.forward *  _acceleration * _inputV * _body.Rigidbody.mass);
-
-        //Debug.Log("Accelerate");
-        //speed = speed + Mathf.Sign(_inputV) * _acceleration * Time.fixedDeltaTime;
-        //speed = Mathf.Clamp(speed, -_maxSpeed, _maxSpeed);
     }
     private void Deaccelerate()
     {

@@ -25,6 +25,7 @@ public class UI_Countdown : MonoBehaviour
 
     private void SetNumber(int obj)
     {
+        Debug.Log("number sent to UI: " + obj);
         bool end = obj <= 0;
         _text.text = end ? "GO!" : obj.ToString();
         if (_routine != null)
@@ -44,7 +45,7 @@ public class UI_Countdown : MonoBehaviour
         }
         transform.localScale = Vector3.one * targetScale;
 
-        if (end)
+        if (!end)
         {
             _routine = null;
             yield break;
@@ -52,6 +53,6 @@ public class UI_Countdown : MonoBehaviour
         GameManager.Instance.startCounter.OnCounterChange -= SetNumber;
 
         yield return new WaitForSeconds(2);
-        gameObject.SetActive(false);
+        transform.parent.gameObject.SetActive(false);
     }
 }

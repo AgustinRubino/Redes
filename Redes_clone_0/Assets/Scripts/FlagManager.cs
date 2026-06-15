@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FlagManager : NetworkBehaviour
+public class FlagManager : MonoBehaviour
 {
     public event Action<int, PlayerRef> OnPlayerPassedFlag;
     public event Action<PlayerRef> OnPlayerCompleteTrack;
@@ -32,12 +32,12 @@ public class FlagManager : NetworkBehaviour
             _flags[_currentIndex].Deactivate();
             _flags[_currentIndex].OnFlagPassed -= ActivateNextFlag;
             //Debug.Log($"Player {Runner.LocalPlayer} passed flag {_currentIndex}!");
-            RPC_PlayerPassedFlag(_currentIndex, Runner.LocalPlayer);
+            PlayerPassedFlag(_currentIndex, SingletonManager.Instance.Runner.LocalPlayer);
         }
         _currentIndex++;
         if (_currentIndex >= _flags.Length)
         {
-            RPC_PlayerCompletedTrack(Runner.LocalPlayer);
+            PlayerCompletedTrack(SingletonManager.Instance.Runner.LocalPlayer);
             return;
         }
 
@@ -45,15 +45,13 @@ public class FlagManager : NetworkBehaviour
         _flags[_currentIndex].OnFlagPassed += ActivateNextFlag;
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayerPassedFlag(int index, PlayerRef player)
+    private void PlayerPassedFlag(int index, PlayerRef player)
     {
         Debug.Log($"Player {player} passed flag {index}");
         OnPlayerPassedFlag?.Invoke(index, player);
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_PlayerCompletedTrack(PlayerRef player)
+    private void PlayerCompletedTrack(PlayerRef player)
     {
         Debug.Log($"Player {player} wins!");
         OnPlayerCompleteTrack?.Invoke(player);

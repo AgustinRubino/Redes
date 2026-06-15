@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class PlayerModel : NetworkBehaviour
 {
-    public static PlayerModel LocalPlayer { get; private set; }
 
     [SerializeField] float _maxHP = 100;
     [SerializeField] float _currentHP = 100;
@@ -22,9 +21,9 @@ public class PlayerModel : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (HasStateAuthority && LocalPlayer == null)
+        if (HasStateAuthority)
         {
-            LocalPlayer = this;
+            SingletonManager.Instance.Player = this;
         }
 
         movement = GetComponent<ForceMovement>();
@@ -37,6 +36,12 @@ public class PlayerModel : NetworkBehaviour
     void OnEnable()
     {
         GameManager.OnGameStateChanged += OnGameStateChanged;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.OnGameStateChanged -= OnGameStateChanged;
+        _nameText.SetActive(false);
     }
 
 
@@ -63,16 +68,11 @@ public class PlayerModel : NetworkBehaviour
     }
 
 
-    private void OnDisable()
-    {
-        _nameText.SetActive(false);
-    }
-
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
-        if (HasStateAuthority && LocalPlayer == this)
+        if (HasStateAuthority && SingletonManager.Instance.Player == this)
         {
-            LocalPlayer = null;
+            SingletonManager.Instance.Player = null;
         }
     }
 

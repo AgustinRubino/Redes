@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerManager : SimulationBehaviour, IPlayerJoined, IPlayerLeft
+public class PlayerManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
 {
     public static event Action OnPlayerJoined;
 
@@ -19,6 +19,8 @@ public class PlayerManager : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 
 
     public static PlayerManager Instance { get; private set; }
+
+
 
     public void PlayerJoined(PlayerRef player)
     {
@@ -57,7 +59,7 @@ public class PlayerManager : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 
     private void OnGameStateChanged(EGameState state)
     {
-        if (state == EGameState.WaitingPlayers || state == EGameState.Countdown) SetPivotCamera();
+        if (state == EGameState.WaitingPlayers) SetPivotCamera();
         else SetGameCamera();
     }
     public void SetPivotCamera()

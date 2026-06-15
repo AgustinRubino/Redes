@@ -9,11 +9,11 @@ public class SpeedMeter : MonoBehaviour
 
     private void OnEnable()
     {
-        _movement = PlayerModel.LocalPlayer.movement;
+        _movement = SingletonManager.Instance.Player.movement;
     }
 
     private void FixedUpdate()
     {
-        _text.text = _movement.Speed.ToString();
+        _text.text =_movement.Speed.ToString(format: "0");
     }
 }

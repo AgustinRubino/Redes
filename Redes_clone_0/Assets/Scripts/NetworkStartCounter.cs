@@ -17,6 +17,7 @@ public class NetworkStartCounter : NetworkBehaviour
 
     private void ChangeTimeLeft()
     {
+        Debug.Log("Time Left: " +TimeLeft);
         OnCounterChange?.Invoke(TimeLeft);
     }
 

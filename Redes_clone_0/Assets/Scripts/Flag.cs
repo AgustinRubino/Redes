@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Flag : NetworkBehaviour
+public class Flag : MonoBehaviour
 {
     public event Action OnFlagPassed;
 
@@ -37,7 +37,6 @@ public class Flag : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!HasStateAuthority) return;
         OnFlagPassed?.Invoke();
     }
 }
