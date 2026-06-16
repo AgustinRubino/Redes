@@ -32,23 +32,18 @@ public class NetworkStartCounter : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (!IsActive) return;
+        if (!IsActive || !HasInputAuthority) return;
 
         if (Timer.Expired(Runner))
         {
             Timer = TickTimer.None;
             IsActive = false;
-            RPC_CounterFinished();
+            OnFinishCounter?.Invoke();
         }
 
         if (Timer.RemainingTime(Runner) < TimeLeft)
         {
             TimeLeft -= 1;
         }
-    }
-
-    private void RPC_CounterFinished()
-    {
-        OnFinishCounter?.Invoke();
     }
 }

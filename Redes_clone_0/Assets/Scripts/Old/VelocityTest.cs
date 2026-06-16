@@ -60,10 +60,10 @@ public class VelocityTest : MonoBehaviour
         //    direction = transform.forward * input.v;
         //}
 
-        //var result = velocity >= _maxSpeed ? Vector3.zero : direction * _maxSpeed * input.v;
-        ////_currentAcceleration = Mathf.Lerp(_maxSpeed, 0, velocity / _maxSpeed);
+        //var result = velocity >= maxSpeed ? Vector3.zero : direction * maxSpeed * input.v;
+        ////_currentAcceleration = Mathf.Lerp(maxSpeed, 0, velocity / maxSpeed);
         //rb.AddForce(result, ForceMode.Acceleration);
-        //rb.AddForce(new Vector3(direction.z,0,-direction.x)* _maxSpeed * input.h, ForceMode.Acceleration);
+        //rb.AddForce(new Vector3(direction.z,0,-direction.x)* maxSpeed * input.h, ForceMode.Acceleration);
         SetVeolcity();
     }
 

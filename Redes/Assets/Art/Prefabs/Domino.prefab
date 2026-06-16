@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1722599251777355586}
   - component: {fileID: 8359353159349020733}
-  m_Layer: 0
+  - component: {fileID: 3682547106247294492}
+  m_Layer: 6
   m_Name: Domino
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 6251274582676197506}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.216834, y: -3.7818165, z: -13.048297}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -52,8 +53,21 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.95, y: 0.75, z: 3}
-  m_Center: {x: 0, y: 0.4, z: -0.15}
+  m_Size: {x: 1.95, y: 0.75, z: 3.4}
+  m_Center: {x: 0, y: 0.4, z: 0}
+--- !u!114 &3682547106247294492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6251274582676197506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f98ecc5a4fdc54644becb325822af9e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  renderer: {fileID: 7086540418453943446}
 --- !u!1001 &6726180344063877721
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -102,6 +116,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: 033c81e9ce2d47c46b653024ce8eab08, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -7640558969779515294, guid: 033c81e9ce2d47c46b653024ce8eab08, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -7146521406498821007, guid: 033c81e9ce2d47c46b653024ce8eab08, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: -6093592463355912122, guid: 033c81e9ce2d47c46b653024ce8eab08, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -114,6 +140,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 1f913ded42627884aad588439534ebf9, type: 2}
+    - target: {fileID: -1599826595754709761, guid: 033c81e9ce2d47c46b653024ce8eab08, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: -1461304994638716399, guid: 033c81e9ce2d47c46b653024ce8eab08, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -126,9 +156,21 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 1f913ded42627884aad588439534ebf9, type: 2}
+    - target: {fileID: -516098083770646512, guid: 033c81e9ce2d47c46b653024ce8eab08, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 033c81e9ce2d47c46b653024ce8eab08, type: 3}
       propertyPath: m_Name
       value: domino
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 033c81e9ce2d47c46b653024ce8eab08, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8416272007918961125, guid: 033c81e9ce2d47c46b653024ce8eab08, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -138,5 +180,10 @@ PrefabInstance:
 --- !u!4 &6544442878093493682 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 033c81e9ce2d47c46b653024ce8eab08, type: 3}
+  m_PrefabInstance: {fileID: 6726180344063877721}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &7086540418453943446 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -4683669308469848369, guid: 033c81e9ce2d47c46b653024ce8eab08, type: 3}
   m_PrefabInstance: {fileID: 6726180344063877721}
   m_PrefabAsset: {fileID: 0}

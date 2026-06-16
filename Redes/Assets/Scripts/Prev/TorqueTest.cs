@@ -21,6 +21,6 @@ public class TorqueTest : MonoBehaviour
         rb.AddTorque(transform.up * _torque * input);
 
         Debug.Log(rb.linearVelocity);
-        //rb.AddForce(transform.forward * _speed * input, ForceMode.Acceleration);
+        //rb.AddForce(transform.forward * Speed * input, ForceMode.Acceleration);
     }
 }

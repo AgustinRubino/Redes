@@ -1,5 +1,6 @@
 using Fusion;
 using Fusion.Sockets;
+using Redes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,12 +33,12 @@ public class FlagManager : MonoBehaviour
             _flags[_currentIndex].Deactivate();
             _flags[_currentIndex].OnFlagPassed -= ActivateNextFlag;
             //Debug.Log($"Player {Runner.LocalPlayer} passed flag {_currentIndex}!");
-            PlayerPassedFlag(_currentIndex, SingletonManager.Instance.Runner.LocalPlayer);
+            PlayerPassedFlag(_currentIndex, ReferenceManager.GameManager.Runner.LocalPlayer);
         }
         _currentIndex++;
         if (_currentIndex >= _flags.Length)
         {
-            PlayerCompletedTrack(SingletonManager.Instance.Runner.LocalPlayer);
+            PlayerCompletedTrack(ReferenceManager.GameManager.Runner.LocalPlayer);
             return;
         }
 

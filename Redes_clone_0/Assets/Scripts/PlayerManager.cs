@@ -1,86 +1,66 @@
-using Fusion;
-using System;
+﻿using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerManager : NetworkBehaviour, IPlayerJoined, IPlayerLeft
+namespace Redes
 {
-    public static event Action OnPlayerJoined;
-
-    public GameObject PlayerPrefab;
-
-    public GameObject cameraPrefab;
-    public GameObject cameraPivot;
-    public GameObject carCamera;
-
-    public PlayerInfo[] playerInfo;
-
-    public PlayerModel localPlayerModel;
-
-
-    public static PlayerManager Instance { get; private set; }
-
-
-
-    public void PlayerJoined(PlayerRef player)
+    public class PlayerManager : NetworkBehaviour
     {
-        if (player == Runner.LocalPlayer)
+        [SerializeField] GameObject _playerPrefab;
+        [SerializeField] PlayerConfigSO[] _configs;
+        [SerializeField] Transform[] _startPositions;
+
+        //private Dictionary<PlayerRef, Player> _players;
+        //public Dictionary<PlayerRef, Player> Players => _players;
+
+        private void OnEnable()
         {
-            OnPlayerJoined?.Invoke();
-            Instance = this;
-            GameManager.OnGameStateChanged += OnGameStateChanged;
-
-            var car = Runner.Spawn(PlayerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            localPlayerModel = car.GetComponent<PlayerModel>();
-            SetPlayer(localPlayerModel, Runner.SessionInfo.PlayerCount -1);
+            PlayerDetector.OnPlayerJoined += SpawnPlayer;
+            PlayerDetector.OnPlayerLeft += DespawnPlayer;
         }
-    }
-
-    private void SetPlayer(PlayerModel model, int index)
-    {
-        if (index >= playerInfo.Length || index < 0)
+        private void OnDisable()
         {
-            model.MeshColor = Color.gray;
+            PlayerDetector.OnPlayerJoined -= SpawnPlayer;
+            PlayerDetector.OnPlayerLeft -= DespawnPlayer;
         }
-        PlayerInfo info = playerInfo[index];
 
-        model.MeshColor = info.color;
-        model.SetPosition(info.position.position);
-        model.SetRotation(info.position.rotation);
-
-        if (GameManager.Instance != null)
-            OnGameStateChanged(GameManager.Instance.GameState);
-    }
-
-    public void PlayerLeft(PlayerRef player)
-    {
-        //throw new NotImplementedException();
-    }
-
-    private void OnGameStateChanged(EGameState state)
-    {
-        if (state == EGameState.WaitingPlayers) SetPivotCamera();
-        else SetGameCamera();
-    }
-    public void SetPivotCamera()
-    {
-        cameraPivot.SetActive(true);
-        if (carCamera != null) carCamera.SetActive(false);
-    }
-    private void SetGameCamera()
-    {
-        if (carCamera == null)
+        private void SpawnPlayer(PlayerRef player)
         {
-            carCamera = Instantiate(cameraPrefab, localPlayerModel.transform);
-        }
-        carCamera.SetActive(true);
-        cameraPivot.SetActive(false);
-    }
+            if (player == Runner.LocalPlayer)
+            {
+                int count = Runner.SessionInfo.PlayerCount;
+                var p = Runner.Spawn(_playerPrefab, _startPositions[count - 1].position, _startPositions[count - 1].rotation)
+                    .GetComponent<Player>();
+                ReferenceManager.Player = p;
 
-    [Serializable]
-    public class PlayerInfo
-    {
-        public Color color = Color.gray;
-        public Transform position;
+                p.SetPlayerConfig(_configs[count - 1].config);
+                Runner.SetPlayerObject(player, p.Object);
+                //RPC_AddPlayer(player);
+            }
+        }
+        private void DespawnPlayer(PlayerRef player)
+        {
+            if (player == Runner.LocalPlayer)
+            {
+                var p = Runner.GetPlayerObject(player);
+                //RPC_RemovePlayer(player);
+                Runner.Despawn(p);
+            }
+        }
+
+        //[Rpc]
+        //public void RPC_AddPlayer(PlayerRef id, Player p)
+        //{
+        //    if (_players == null) _players = new();
+        //    if (_players.ContainsKey(id)) return;
+
+        //    _players[id] = ReferenceManager.Player;
+        //}
+        //[Rpc]
+        //public bool RPC_RemovePlayer(PlayerRef id)
+        //{
+        //    if (_players == null) return false;
+        //    return _players.Remove(id);
+        //}
     }
 }

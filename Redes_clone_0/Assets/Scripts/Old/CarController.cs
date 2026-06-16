@@ -98,7 +98,7 @@ public class CarController : MonoBehaviour
 
         //Debug.Log("Accelerate");
         //speed = speed + Mathf.Sign(_inputV) * _acceleration * Time.fixedDeltaTime;
-        //speed = Mathf.Clamp(speed, -_maxSpeed, _maxSpeed);
+        //speed = Mathf.Clamp(speed, -maxSpeed, maxSpeed);
     }
     private void Deaccelerate()
     {
