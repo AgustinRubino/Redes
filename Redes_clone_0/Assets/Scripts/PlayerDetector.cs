@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using UnityEngine;
 using System;
 
 namespace Redes
@@ -10,6 +11,7 @@ namespace Redes
 
         public void PlayerJoined(PlayerRef player)
         {
+            Debug.Log("Player " + player + " Joined!");
             OnPlayerJoined(player);
         }
 

@@ -1,6 +1,7 @@
+using Fusion;
 using UnityEngine;
 
-public class RendererAccesor : MonoBehaviour
+public class RendererAccesor : NetworkBehaviour
 {
     public MeshRenderer renderer;
 }

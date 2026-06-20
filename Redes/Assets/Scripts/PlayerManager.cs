@@ -6,7 +6,7 @@ namespace Redes
 {
     public class PlayerManager : NetworkBehaviour
     {
-        [SerializeField] GameObject _playerPrefab;
+        [SerializeField] Player _playerPrefab;
         [SerializeField] PlayerConfigSO[] _configs;
         [SerializeField] Transform[] _startPositions;
 
@@ -15,6 +15,7 @@ namespace Redes
 
         private void OnEnable()
         {
+            Debug.Log("OnEnable");
             PlayerDetector.OnPlayerJoined += SpawnPlayer;
             PlayerDetector.OnPlayerLeft += DespawnPlayer;
         }
@@ -24,13 +25,17 @@ namespace Redes
             PlayerDetector.OnPlayerLeft -= DespawnPlayer;
         }
 
-        private void SpawnPlayer(PlayerRef player)
+        private void SpawnPlayer(PlayerRef player) => RPC_SpawnPlayer(player);
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_SpawnPlayer(PlayerRef player)
         {
+            Debug.Log(Runner);
             if (player == Runner.LocalPlayer)
             {
+                Debug.Log("Local Player " + player);
                 int count = Runner.SessionInfo.PlayerCount;
-                var p = Runner.Spawn(_playerPrefab, _startPositions[count - 1].position, _startPositions[count - 1].rotation)
-                    .GetComponent<Player>();
+                var p = Runner.Spawn(_playerPrefab, _startPositions[count - 1].position, _startPositions[count - 1].rotation);
                 ReferenceManager.Player = p;
 
                 p.SetPlayerConfig(_configs[count - 1].config);
@@ -38,7 +43,11 @@ namespace Redes
                 //RPC_AddPlayer(player);
             }
         }
-        private void DespawnPlayer(PlayerRef player)
+
+        private void DespawnPlayer(PlayerRef player) => RPC_DespawnPlayer(player);
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_DespawnPlayer(PlayerRef player)
         {
             if (player == Runner.LocalPlayer)
             {

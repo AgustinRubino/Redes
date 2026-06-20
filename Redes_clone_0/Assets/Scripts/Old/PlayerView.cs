@@ -33,11 +33,12 @@ namespace Redes
             if (HasStateAuthority)
             {
                 _playerNameTagObj.SetActive(false);
-                
+                PlayCam.gameObject.SetActive(true);
             }
             else
             {
                 _playerNameTagObj.SetActive(true);
+                PlayCam.gameObject.SetActive(false);
             }
 
             _player.Controller.OnDashed += Dashed;
@@ -69,7 +70,6 @@ namespace Redes
         #region Init
         public void RPC_SetView(PlayerConfig config)
         {
-
             RPC_SetCarModel(config.carModelIndex);
             RPC_SetCarColor(config.color);
             RPC_SetTagName(config.name);

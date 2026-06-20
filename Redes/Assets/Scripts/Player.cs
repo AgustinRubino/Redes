@@ -13,7 +13,7 @@ namespace Redes
         [Space(10)]
         [SerializeField] private PlayerController _controller;
         public PlayerController Controller => _controller;
-        bool _paused = true;
+        [SerializeField] bool _paused = true;
 
 
         [SerializeField] private bool _isGhost = false;
@@ -88,7 +88,7 @@ namespace Redes
         private void Update()
         {
             if (_inputs == null) return;
-            if (!HasStateAuthority) return;
+            if (!HasStateAuthority || _paused) return;
 
             _inputs.UpdateInputs();
         }
@@ -100,7 +100,8 @@ namespace Redes
 
             _inputs = new();
             _controller.Set(this, _inputs);
-            _view.RPC_SetView( _config);
+            _view.RPC_SetView(_config);
+            Debug.Log($"player {Object.name} spawned!");
         }
 
         public override void FixedUpdateNetwork()
@@ -119,7 +120,9 @@ namespace Redes
         public void SetPlayerConfig(PlayerConfig config)
         {
             _config = config;
-            gameObject.name = "Player: " + _config.name;
+            Object.name = _config.name;
+            Debug.Log($"Player's {config.name} config setted");
+            _view.RPC_SetView(_config);
         }
 
     }
