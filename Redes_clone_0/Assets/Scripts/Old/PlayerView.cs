@@ -8,12 +8,15 @@ namespace Redes
     public class PlayerView : NetworkBehaviour
     {
         [Header("Car View")]
+        [Networked, OnChangedRender(nameof(SetCarModel))] public int CarModelIndex { get; set; }
         [SerializeField] CarModels _models;
         [SerializeField] GameObject _carModel;
         [SerializeField] MeshRenderer _renderer;
+        [Networked, OnChangedRender(nameof(SetCarColor))] public Color CarColor { get; set; }
         [Space(5)]
         [SerializeField] public Camera PlayCam;
-        [Space(5)]
+        [field: Space(5)]
+        [Networked, OnChangedRender(nameof(SetTagName))] public string PlayerName { get; set;  }
         [SerializeField] GameObject _playerNameTagObj;
         [SerializeField] TMPro.TMP_Text _playerNameTagTxt;
         [Space(15)]
@@ -40,6 +43,13 @@ namespace Redes
                 _playerNameTagObj.SetActive(true);
                 PlayCam.gameObject.SetActive(false);
             }
+            if (_carModel == null)
+            {
+                SetCarModel();
+                SetCarColor();
+                SetTagName();
+            }
+
 
             _player.Controller.OnDashed += Dashed;
             _player.Controller.OnJumped += Jumped;
@@ -68,22 +78,26 @@ namespace Redes
 
 
         #region Init
-        public void RPC_SetView(PlayerConfig config)
+        public void SetView(PlayerConfig config)
         {
-            RPC_SetCarModel(config.carModelIndex);
-            RPC_SetCarColor(config.color);
-            RPC_SetTagName(config.name);
+            CarModelIndex = config.carModelIndex;
+            PlayerName = config.name;
+            CarColor = config.color;
+
+            //RPC_SetCarModel(config.carModelIndex);
+            //RPC_SetCarColor(config.color);
+            //RPC_SetTagName(config.name);
         }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetTagName(string name) => _playerNameTagTxt.text = name;
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetCarColor(Color color) => _renderer.material.color = color;
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetCarModel(int index)
+        private void SetTagName() => _playerNameTagTxt.text = PlayerName;
+
+        private void SetCarColor() => _renderer.material.color = CarColor;
+
+        private void SetCarModel()
         {
             if (_carModel != null) Destroy(_carModel);
-            _carModel = Instantiate(_models.Models[index], _player.transform);
+         
+            _carModel = Instantiate(_models.Models[CarModelIndex], _player.transform);
             _renderer = _carModel.GetComponent<MeshRenderer>();
             if (_renderer == null)
                 _renderer = _carModel.GetComponent<RendererAccesor>().renderer;

@@ -13,7 +13,7 @@ namespace Redes
         [Space(10)]
         [SerializeField] private PlayerController _controller;
         public PlayerController Controller => _controller;
-        [SerializeField] bool _paused = true;
+        [Networked] bool Paused { get; set; }
 
 
         [SerializeField] private bool _isGhost = false;
@@ -35,7 +35,7 @@ namespace Redes
         }
 
         InputHandler _inputs;
-        NetworkRigidbody3D _rb;
+        [SerializeField] NetworkRigidbody3D _rb;
         public Rigidbody RB => _rb.Rigidbody;
 
         #region GameManager
@@ -46,7 +46,7 @@ namespace Redes
                 case EGameState.Racing:
                     if (IsGhost) break;
                     _view.PlayCam.enabled = true;
-                    _paused = false;
+                    if (HasStateAuthority) Paused = false;
                     break;
                 case EGameState.Countdown:
                     if (!IsGhost) 
@@ -56,7 +56,7 @@ namespace Redes
                     _view.PlayCam.enabled = false;
                     break;
                 case EGameState.Finishing:
-                    _paused = true;
+                    if (HasStateAuthority) Paused = true;
                     break;
             }
         }
@@ -88,7 +88,7 @@ namespace Redes
         private void Update()
         {
             if (_inputs == null) return;
-            if (!HasStateAuthority || _paused) return;
+            if (!HasStateAuthority || Paused) return;
 
             _inputs.UpdateInputs();
         }
@@ -97,16 +97,23 @@ namespace Redes
         public override void Spawned()
         {
             if (!HasStateAuthority) return;
+            //if (RB == null) _rb = GetComponent<NetworkRigidbody3D>();
 
             _inputs = new();
             _controller.Set(this, _inputs);
-            _view.RPC_SetView(_config);
+            _view.SetView(_config);
+
+            //if (GameManager.HasSpawned)
+            //{
+            //    OnGameStateChanged(ReferenceManager.GameManager.GameState);
+            //}
+
             Debug.Log($"player {Object.name} spawned!");
         }
 
         public override void FixedUpdateNetwork()
         {
-            if (!HasStateAuthority || _paused) return;
+            if (!HasStateAuthority || Paused) return;
 
             Controller.UpdateController();
         }
@@ -122,7 +129,7 @@ namespace Redes
             _config = config;
             Object.name = _config.name;
             Debug.Log($"Player's {config.name} config setted");
-            _view.RPC_SetView(_config);
+            _view.SetView(_config);
         }
 
     }

@@ -426,10 +426,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 575bff1771f10754c884265ec9f7e27a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _CarModelIndex: 0
   _models: {fileID: 11400000, guid: c930139e0efc4a9468c5d5a422a93aba, type: 2}
   _carModel: {fileID: 0}
   _renderer: {fileID: 0}
+  _CarColor: {r: 0, g: 0, b: 0, a: 0}
   PlayCam: {fileID: 4604080857610184388}
+  _PlayerName: 
   _playerNameTagObj: {fileID: 629949757453651969}
   _playerNameTagTxt: {fileID: 9174771766600260818}
   _engineAudio: {fileID: 1611123379570867770}
@@ -634,6 +637,7 @@ MonoBehaviour:
     <TargetVelocity>k__BackingField: {x: 0, y: 0, z: 0}
     <DashTimer>k__BackingField: 0
   _isGhost: 0
+  _rb: {fileID: 1068891226770382166}
 --- !u!1 &8963962446611137804
 GameObject:
   m_ObjectHideFlags: 0
