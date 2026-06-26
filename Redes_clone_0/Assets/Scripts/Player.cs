@@ -1,5 +1,6 @@
 using Fusion;
 using Fusion.Addons.Physics;
+using System;
 using UnityEngine;
 
 namespace Redes
@@ -13,8 +14,16 @@ namespace Redes
         [Space(10)]
         [SerializeField] private PlayerController _controller;
         public PlayerController Controller => _controller;
-        [Networked] bool Paused { get; set; }
+        [Networked, OnChangedRender(nameof(OnPause))] bool Paused { get; set; }
 
+        private void OnPause()
+        {
+            _view.Activate(Paused);
+            if (Paused)
+            {
+                RB.linearVelocity = Vector3.zero;
+            }
+        }
 
         [SerializeField] private bool _isGhost = false;
         public bool IsGhost { 

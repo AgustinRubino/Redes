@@ -1,4 +1,5 @@
 using Fusion;
+using Redes;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
@@ -37,6 +38,7 @@ public class Flag : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.transform.root.name == ReferenceManager.Player.name)
         OnFlagPassed?.Invoke();
     }
 }

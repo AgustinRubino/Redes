@@ -82,8 +82,11 @@ namespace Redes
 
         private void SetVariables()
         {
+            if (_player.transform.position.y < 0)
+            {
+                _player.RB.MovePosition(_player.transform.position.With(y: 0));
+            }
             Speed = _player.RB.linearVelocity.magnitude;
-
             CurrentVelocity = _player.RB.linearVelocity.With(y: 0);
             MoveDirection = MathF.Sign(Vector3.Dot(_player.transform.forward, CurrentVelocity));
         }

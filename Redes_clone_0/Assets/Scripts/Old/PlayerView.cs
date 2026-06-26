@@ -50,7 +50,7 @@ namespace Redes
                 SetTagName();
             }
 
-
+            _engineAudio.Play();
             _player.Controller.OnDashed += Dashed;
             _player.Controller.OnJumped += Jumped;
         }
@@ -109,7 +109,7 @@ namespace Redes
         private void RPC_SetEngineSound(float speed)
         {
             if (speed < 0.05f) _engineAudio.volume = 0;
-            _engineAudio.volume = Mathf.Lerp(0, _maxEngineVolume, speed);
+            else _engineAudio.volume = Mathf.Lerp(0, _maxEngineVolume, speed);
         }
 
         #endregion
@@ -123,10 +123,21 @@ namespace Redes
 
         private void Dashed() => RPC_OnDash();
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        //[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_OnDash()
         {
             _onDashing.Invoke();
+        }
+        internal void Activate(bool active)
+        {
+            if (active)
+            {
+                _engineAudio.Pause();
+            }
+            else
+            {
+                _engineAudio.UnPause();
+            }
         }
     }
 }

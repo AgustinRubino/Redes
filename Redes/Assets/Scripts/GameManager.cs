@@ -20,6 +20,9 @@ namespace Redes
         [SerializeField] float _startCountdown = 10;
         [SerializeField] int _maxWinners = 3;
         [SerializeField] List<PlayerRef> _winners;
+        [Space(10)]
+        [SerializeField] GameObject _winScreen;
+        [SerializeField] GameObject _loseScreen;
         [Space(10), Header("References")]
         [SerializeField] PlayerManager _playerManager;
         [SerializeField] FlagManager _flagManager;
@@ -32,9 +35,9 @@ namespace Redes
 
             _flagManager.OnPlayerCompleteTrack += PlayerCompletedTrack;
 
-            if (!HasInputAuthority) return;
+            if (!HasStateAuthority) return;
             counter.OnFinishCounter += CounterFinished;
-            
+
 
         }
 
@@ -50,7 +53,7 @@ namespace Redes
             if (GameState != EGameState.Countdown) return;
             GameState = EGameState.Racing;
         }
-#endregion
+        #endregion
         private void OnEnable()
         {
             PlayerDetector.OnPlayerJoined += CheckPlayerAmount;
@@ -100,30 +103,58 @@ namespace Redes
         #region Finnished
         private void PlayerCompletedTrack(PlayerRef @ref)
         {
+            Debug.Log("on gamemanager");
             RPC_OnPlayerCompletedTrack(@ref);
         }
 
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
         private void RPC_OnPlayerCompletedTrack(PlayerRef player)
         {
+            Debug.Log("on completed track");
+
             if (_winners == null) _winners = new List<PlayerRef>();
             _winners.Add(player);
 
-            if (_winners.Count > _maxWinners)
+            if (_winners.Count < _maxWinners)
+                return;
+
+            GameState = EGameState.Finishing;
+
+            foreach(var pRef in Runner.ActivePlayers)
             {
-                GameState = EGameState.Finishing;
-                for (int i = 0; i < _winners.Count; i++)
+                if (_winners.Contains(pRef))
                 {
-                    RPC_OnFinishing(i, _winners[i]);
+                    RPC_Win(pRef);
                 }
+                else
+                    RPC_Defeat(pRef);
             }
+
         }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void RPC_OnFinishing(int index, PlayerRef player)
+        [Rpc]
+        public void RPC_Win([RpcTarget] PlayerRef player)
         {
-            OnPlayersWin?.Invoke(index, player);
+            // Show Win
+            _winScreen.transform.SetParent(Camera.main.transform);
+            _winScreen.GetComponent<RectTransform>().ForceUpdateRectTransforms();
+            _winScreen.SetActive(true);
         }
+
+        [Rpc]
+        public void RPC_Defeat([RpcTarget] PlayerRef player)
+        {
+            // Show Defeat
+            _loseScreen.transform.SetParent(Camera.main.transform);
+            _loseScreen.GetComponent<RectTransform>().ForceUpdateRectTransforms();
+            _loseScreen.SetActive(true);
+            //OnPlayersWin?.Invoke(index, player);
+        }
+
+        //[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        //public void RPC_OnFinishing(int index, PlayerRef player)
+        //{
+        //}
 
         #endregion
 
@@ -132,7 +163,7 @@ namespace Redes
             Debug.Log("Game State changed to: " + GameState);
             OnGameStateChanged?.Invoke(GameState);
         }
-        
+
 
 
     }
