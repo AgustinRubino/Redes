@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Fusion;
 using Fusion.Sockets;
 using UnityEngine;
@@ -7,12 +8,15 @@ using UnityEngine.SceneManagement;
 
 namespace Host
 {
-    public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
+    public class MenuRunnerHandler : MonoBehaviour, INetworkRunnerCallbacks
     {
         private NetworkRunner _runner;
+        public event Action<List<SessionInfo>> OnSessionListUpdate;
 
         [SerializeField] private NetworkPrefabRef _playerPrefab;
         private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+
+        HostInputHandler _inputHandler;
 
         async void StartGame(GameMode mode)
         {
@@ -58,45 +62,71 @@ namespace Host
                 _spawnedCharacters.Remove(player);
             }
         }
-        private bool _mouseButton0;
-        private bool _mouseButton1;
-        private void Update()
-        {
-            _mouseButton0 = _mouseButton0 | Input.GetMouseButton(0);
-            _mouseButton1 = _mouseButton1 | Input.GetMouseButton(1);
-        }
         void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)
         {
-            var data = new InputData();
-
-            if (Input.GetKey(KeyCode.W))
-                data.forward += 1;
-            if (Input.GetKey(KeyCode.S))
-                data.forward -= 1;
-            if (Input.GetKey(KeyCode.D))
-                data.right += 1;
-            if (Input.GetKey(KeyCode.A))
-                data.right -= 1;
-
-            data.Buttons.Set(InputData.MouseButton0, _mouseButton0);
-            _mouseButton0 = false;
-
-            input.Set(data);
+            //var data = new InputData();
 
             //if (Input.GetKey(KeyCode.W))
-            //    data.Direction += Vector3.forward;
-
+            //    data.forward += 1;
             //if (Input.GetKey(KeyCode.S))
-            //    data.Direction += Vector3.back;
-
-            //if (Input.GetKey(KeyCode.A))
-            //    data.Direction += Vector3.left;
-
+            //    data.forward -= 1;
             //if (Input.GetKey(KeyCode.D))
-            //    data.Direction += Vector3.right;
+            //    data.right += 1;
+            //if (Input.GetKey(KeyCode.A))
+            //    data.right -= 1;
 
-            input.Set(data);
+            //data.Buttons.Set(InputData.MouseButton0, _mouseButton0);
+            //_mouseButton0 = false;
+
+            input.Set(_inputHandler.GetData());
         }
+
+        private void Update()
+        {
+            _inputHandler.UpdateInputs();
+        }
+
+        #region StartGame
+        public async void CreateGame(string sessionName, string sceneName)
+        {
+            //await InitializeGame(GameMode.Host, sessionName, SceneUtility.GetBuildIndexByScenePath($"Scenes/{sceneName}"));
+            int sceneIndex = SceneUtility.GetBuildIndexByScenePath("Scenes/LevelScene");
+            if (sceneIndex < 0)
+            {
+                Debug.LogError("[Custom Error] LevelScene not found in Build Settings.");
+                return;
+            }
+            await InitializeGame(GameMode.Host, sessionName, sceneIndex);
+        }
+
+        public async void JoinGame(SessionInfo sessionInfo)
+        {
+            await InitializeGame(GameMode.Client, sessionInfo.Name, SceneManager.GetActiveScene().buildIndex);
+        }
+
+        async Task InitializeGame(GameMode gameMode, string sessionName, int sceneIndex)
+        {
+            _runner.ProvideInput = true;
+
+            var result = await _runner.StartGame(new StartGameArgs()
+            {
+                GameMode = gameMode,
+                Scene = SceneRef.FromIndex(sceneIndex),
+                SessionName = sessionName,
+                PlayerCount = 8
+            });
+
+            if (!result.Ok)
+            {
+                Debug.LogError($"[Custom Error] Unable to Start Game");
+            }
+            else
+            {
+                Debug.Log($"[Custom Msg] Game Started");
+            }
+        }
+
+        #endregion
 
         private void OnGUI()
         {
@@ -113,7 +143,11 @@ namespace Host
                 }
             }
         }
+        void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {
+            OnSessionListUpdate?.Invoke(sessionList);
+        }
 
+        #region Network Runner Callbacks
         void INetworkRunnerCallbacks.OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
         void INetworkRunnerCallbacks.OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
         void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) { }
@@ -121,7 +155,6 @@ namespace Host
         void INetworkRunnerCallbacks.OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
         void INetworkRunnerCallbacks.OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
         void INetworkRunnerCallbacks.OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-        void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
         void INetworkRunnerCallbacks.OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
         void INetworkRunnerCallbacks.OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
         void INetworkRunnerCallbacks.OnSceneLoadDone(NetworkRunner runner) { }
@@ -130,5 +163,7 @@ namespace Host
         void INetworkRunnerCallbacks.OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
         void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
         void INetworkRunnerCallbacks.OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
+
+        #endregion
     }
 }

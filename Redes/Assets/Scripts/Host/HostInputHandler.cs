@@ -8,8 +8,6 @@ namespace Host
 {
     public class HostInputHandler
     {
-        bool _jumpInput;
-        bool _dashInput;
         private InputData _data;
 
         public HostInputHandler() => _data = new InputData();
@@ -20,16 +18,15 @@ namespace Host
             _data.forward = axis.y > 0 ? (sbyte)1 : axis.y < 0 ? (sbyte)-1 : (sbyte)0;
             _data.right = axis.x > 0 ? (sbyte)1 : axis.x < 0 ? (sbyte)-1 : (sbyte)0;
 
-            if (!_jumpInput)
-            {
-                _jumpInput = Input.GetKeyDown(KeyCode.Space);
-            }
-            if (!_dashInput)
-            {
-                _dashInput = Input.GetKeyDown(KeyCode.LeftShift);
-            }
+            _data.jump |= Input.GetMouseButton(0);
+            _data.dash |= Input.GetMouseButton(1);
         }
 
-        public InputData GetData() => _data;
+        public InputData GetData()
+        {
+            InputData result = _data;
+            _data = new();
+            return result;
+        }
     }
 }
