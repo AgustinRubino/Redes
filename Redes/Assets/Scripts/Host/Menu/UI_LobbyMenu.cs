@@ -8,21 +8,27 @@ public class UI_LobbyMenu : MonoBehaviour
     [SerializeField] GameObject _userDataMenu;
     [SerializeField] GameObject _findLobbyMenu;
     [SerializeField] GameObject _createLobbyMenu;
-    [SerializeField] GameObject _joinningLobbyMenu;
+    //[SerializeField] GameObject _joinningLobbyMenu;
+
+    public MenuRunnerHandler RunnerHandler => _runnerHandler;
 
     private void Awake()
     {
         CloseAll();
+        if (PlayerInfo.Data == null)
+        {
+            new GameObject("Player Info").AddComponent<PlayerInfo>();
+        }
     }
 
     private void Start()
     {
-        if (PlayerInfo.Data.name is null or "")
+        if (string.IsNullOrEmpty(PlayerInfo.Data.name))
         {
             _userDataMenu.SetActive(true);
             _userDataMenu.GetComponent<UI_SetPlayerData>().ShowNewUserLabel();
         }
-        _findLobbyMenu.SetActive(true);
+        else _findLobbyMenu.SetActive(true);
     }
 
     private void CloseAll()
@@ -30,7 +36,7 @@ public class UI_LobbyMenu : MonoBehaviour
         _userDataMenu.SetActive(false);
         _findLobbyMenu.SetActive(false);
         _createLobbyMenu.SetActive(false);
-        _joinningLobbyMenu.SetActive(false);
+       // _joinningLobbyMenu.SetActive(false);
     }
 
 
@@ -46,9 +52,9 @@ public class UI_LobbyMenu : MonoBehaviour
         CloseAll();
         _createLobbyMenu.SetActive(true);
     }
-    public void OpenJoin() {
-        CloseAll();
-        _joinningLobbyMenu.SetActive(true);
-    }
+    //public void OpenJoin() {
+    //    CloseAll();
+    //    _joinningLobbyMenu.SetActive(true);
+    //}
 
 }

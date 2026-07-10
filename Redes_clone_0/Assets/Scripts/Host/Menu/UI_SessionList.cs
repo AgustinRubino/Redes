@@ -11,29 +11,58 @@ public class UI_SessionList : MonoBehaviour
     [SerializeField] private UI_SessionItem _sessionItemPrefab;
 
     [SerializeField] private MenuRunnerHandler _networkRunnerHandler;
-    //[SerializeField] private NetworkRunnerHandler _networkRunnerHandler;
 
     [SerializeField] private TMP_Text _statusText;
+    [SerializeField] private GameObject _findingText;
 
     [SerializeField] private VerticalLayoutGroup _verticalLayout;
+    private void Awake()
+    {
+        if (_networkRunnerHandler == null)
+            _networkRunnerHandler = GetComponentInParent<MenuRunnerHandler>();
 
+        //_networkRunnerHandler.OnSessionListUpdate += ReceiveSessionList;
+        _networkRunnerHandler.OnSessionListUpdate += ReceiveSessionList;
+        _networkRunnerHandler.OnLobbyFound += Found;
+        //_networkRunnerHandler.OnLobbyNotFound += NotFound;
+    }
     private void OnEnable()
     {
-        _networkRunnerHandler.OnSessionListUpdate += ReceiveSessionList;
+        _networkRunnerHandler.JoinLobby();
+        _findingText.SetActive(true);
     }
-
     private void OnDisable()
     {
+        _findingText.SetActive(true);
+        _statusText.gameObject.SetActive(false);
+        ClearBrowser();
+        //_networkRunnerHandler.OnSessionListUpdate -= ReceiveSessionList;
+    }
+
+    private void OnDestroy()
+    {
+        _networkRunnerHandler.OnLobbyFound -= Found;
+        //_networkRunnerHandler.OnLobbyNotFound -= NotFound;
         _networkRunnerHandler.OnSessionListUpdate -= ReceiveSessionList;
     }
 
+    private void Found()
+    {
+        _findingText.SetActive(false);
+        _statusText.gameObject.SetActive(true);
+        _statusText.text = "no sessions found";
+    }
+
+    private void NotFound()
+    {
+        _findingText.SetActive(false);
+        _statusText.text = "Couldn't Find Any Lobby";
+    }
     void ReceiveSessionList(List<SessionInfo> sessionList)
     {
-        ClearBrowser();
-
         if (sessionList.Count == 0)
         {
-            NoSessionsFound();
+            _statusText.gameObject.SetActive(true);
             return;
         }
 
@@ -51,12 +80,6 @@ public class UI_SessionList : MonoBehaviour
         }
 
         _statusText.gameObject.SetActive(false);
-    }
-
-    void NoSessionsFound()
-    {
-        _statusText.text = "No sessions found";
-        _statusText.gameObject.SetActive(true);
     }
 
     void AddToSessionBrowser(SessionInfo sessionInfo)

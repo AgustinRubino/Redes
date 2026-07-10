@@ -12,55 +12,88 @@ namespace Host
     {
         private NetworkRunner _runner;
         public event Action<List<SessionInfo>> OnSessionListUpdate;
+        public event Action OnLobbyNotFound;
+        public event Action OnLobbyFound;
 
-        [SerializeField] private NetworkPrefabRef _playerPrefab;
-        private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+        //[SerializeField] private NetworkPrefabRef _playerPrefab;
+        //private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
         HostInputHandler _inputHandler;
 
-        async void StartGame(GameMode mode)
+        //async void StartGame(GameMode mode)
+        //{
+        //    // Create the Fusion runner and let it know that we will be providing user input
+        //    _runner = gameObject.AddComponent<NetworkRunner>();
+        //    _runner.ProvideInput = true;
+
+        //    // Create the NetworkSceneInfo from the current scene
+        //    var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
+        //    var sceneInfo = new NetworkSceneInfo();
+        //    if (scene.IsValid)
+        //    {
+        //        sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
+        //    }
+
+        //    // Start or join (depends on gamemode) a session with a specific name
+        //    await _runner.StartGame(new StartGameArgs()
+        //    {
+        //        GameMode = mode,
+        //        SessionName = "TestRoom",
+        //        Scene = scene,
+        //        SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+        //    });
+        //}
+        public void JoinLobby()
         {
-            // Create the Fusion runner and let it know that we will be providing user input
-            _runner = gameObject.AddComponent<NetworkRunner>();
-            _runner.ProvideInput = true;
+            if (_runner == null)
+                _runner = new GameObject("Runner").AddComponent<NetworkRunner>();
+                _runner.AddCallbacks(this);
 
-            // Create the NetworkSceneInfo from the current scene
-            var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
-            var sceneInfo = new NetworkSceneInfo();
-            if (scene.IsValid)
-            {
-                sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
-            }
-
-            // Start or join (depends on gamemode) a session with a specific name
-            await _runner.StartGame(new StartGameArgs()
-            {
-                GameMode = mode,
-                SessionName = "TestRoom",
-                Scene = scene,
-                SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
-            });
+            JoinLobbyAsync();
         }
+        async void JoinLobbyAsync()
+        {
+            var result = await _runner.JoinSessionLobby(SessionLobby.Custom, "Normal lobby");
+
+            if (!result.Ok)
+            {
+                Debug.LogError($"[Custom Error] Unable to Join Lobby");
+
+                OnLobbyNotFound?.Invoke();
+            }
+            else
+            {
+                Debug.Log($"[Custom Msg] Joined Lobby");
+
+                OnLobbyFound?.Invoke();
+            }
+        }
+
+        public async void LeaveLobbyAsync()
+        {
+            await _runner.Shutdown(false);
+        }
+
 
         void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
-            if (runner.IsServer)
-            {
-                // Create a unique position for the player
-                Vector3 spawnPosition = new Vector3((player.RawEncoded % runner.Config.Simulation.PlayerCount) * 3, 1, 0);
-                NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
-                // Keep track of the player avatars for easy access
-                _spawnedCharacters.Add(player, networkPlayerObject);
-            }
+            //if (runner.IsServer)
+            //{
+            //    // Create a unique position for the player
+            //    Vector3 spawnPosition = new Vector3((player.RawEncoded % runner.Config.Simulation.PlayerCount) * 3, 1, 0);
+            //    NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+            //    // Keep track of the player avatars for easy access
+            //    _spawnedCharacters.Add(player, networkPlayerObject);
+            //}
         }
 
         void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            if (_spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
-            {
-                runner.Despawn(networkObject);
-                _spawnedCharacters.Remove(player);
-            }
+            //if (_spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
+            //{
+            //    runner.Despawn(networkObject);
+            //    _spawnedCharacters.Remove(player);
+            //}
         }
         void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)
         {
@@ -81,16 +114,17 @@ namespace Host
             input.Set(_inputHandler.GetData());
         }
 
-        private void Update()
-        {
-            _inputHandler.UpdateInputs();
-        }
 
         #region StartGame
-        public async void CreateGame(string sessionName, string sceneName)
+        public void CreateGame(string sessionName, string sceneName)
+        {
+            int sceneIndex = SceneUtility.GetBuildIndexByScenePath("Scenes/LevelScene");
+            CreateGame(sessionName, sceneIndex);
+        }
+        public async void CreateGame(string sessionName, int sceneIndex)
         {
             //await InitializeGame(GameMode.Host, sessionName, SceneUtility.GetBuildIndexByScenePath($"Scenes/{sceneName}"));
-            int sceneIndex = SceneUtility.GetBuildIndexByScenePath("Scenes/LevelScene");
+            
             if (sceneIndex < 0)
             {
                 Debug.LogError("[Custom Error] LevelScene not found in Build Settings.");
@@ -128,26 +162,26 @@ namespace Host
 
         #endregion
 
-        private void OnGUI()
-        {
-            if (_runner == null)
-            {
-                if (GUI.Button(new Rect(0, 0, 200, 40), "Host"))
-                {
-                    StartGame(GameMode.Host);
-                }
+        //private void OnGUI()
+        //{
+        //    if (_runner == null)
+        //    {
+        //        if (GUI.Button(new Rect(0, 0, 200, 40), "Host"))
+        //        {
+        //            StartGame(GameMode.Host);
+        //        }
 
-                if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
-                {
-                    StartGame(GameMode.Client);
-                }
-            }
-        }
+        //        if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
+        //        {
+        //            StartGame(GameMode.Client);
+        //        }
+        //    }
+        //}
+
+        #region Network Runner Callbacks
         void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {
             OnSessionListUpdate?.Invoke(sessionList);
         }
-
-        #region Network Runner Callbacks
         void INetworkRunnerCallbacks.OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
         void INetworkRunnerCallbacks.OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
         void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) { }
