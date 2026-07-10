@@ -8,5 +8,5 @@ public class PlayerData : IStorableData
 
     public string name = "";
     public int carIndex = 0;
-    public Color carColor = Color.white;
+    public Color carColor = Color.red;
 }

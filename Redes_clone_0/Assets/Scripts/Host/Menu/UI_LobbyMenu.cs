@@ -55,7 +55,7 @@ public class UI_LobbyMenu : MonoBehaviour
     }
     public void LoadingScreen()
     {
-        CloseAll();
+        //CloseAll();
         _loadingMenu.SetActive(true);
     }
 

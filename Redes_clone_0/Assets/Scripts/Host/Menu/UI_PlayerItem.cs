@@ -28,7 +28,7 @@ public class UI_PlayerItem : NetworkBehaviour
         _colorIMG.color = Color;
     }
     void ReadyChanged() {
-        _readyTxt.text = Ready ? "raedy" : "not ready";
+        _readyTxt.text = Ready ? "ready" : "not ready";
         _readyTxt.color = Ready ? Color.green : Color.red;
     }
 }

@@ -11,13 +11,18 @@ public class UI_CreateLobbyMenu : MonoBehaviour
     [SerializeField] Button _backBTN;
     [SerializeField] TMP_Text _warningTxt;
 
-    const string LENGTH_EXCEPTION = "The size of the lobby's name has to be above 4 letters";
+    const string LENGTH_EXCEPTION = "The size of the lobby's name has to be above 6 letters";
     const string NULL_EXCEPTION = "the name cannot be empty";
     private void Awake()
     {
         _warningTxt.text = "";
         _hostBTN.onClick.AddListener(Host);
         _backBTN.onClick.AddListener(() => GetComponentInParent<UI_LobbyMenu>().OpenLobby());
+    }
+
+    private void OnEnable()
+    {
+        _hostBTN.interactable = true;
     }
 
     private void Host()
@@ -27,7 +32,7 @@ public class UI_CreateLobbyMenu : MonoBehaviour
             _warningTxt.text = $"<color=red>{NULL_EXCEPTION}";
             return;
         }
-        if (_input.text.Length <= 4)
+        if (_input.text.Length <= 6)
         {
             _warningTxt.text = $"<color=red>{LENGTH_EXCEPTION}";
             return;

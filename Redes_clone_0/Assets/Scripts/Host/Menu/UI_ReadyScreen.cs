@@ -31,16 +31,15 @@ public class UI_ReadyScreen : NetworkBehaviour
     Dictionary<PlayerRef, UI_PlayerItem> _playerItems;
     public override void Spawned()
     {
+        _playerItems = new();
 
         _readyBTN.onClick.AddListener(() => RPC_Ready(Runner.LocalPlayer));
         _quitBTN.onClick.AddListener(() => SceneManager.LoadScene(SceneIndex.MainMenu));
         _colorBTN.onClick.AddListener(OpenColorMenu);
         _carBTN.onClick.AddListener(OpenCarMenu);
 
-        if (!HasStateAuthority) return;
+        if (!Runner.IsServer) return;
 
-        Debug.Log("Menu opened");
-        _playerItems = new();
 
         if(Host.PlayerManager.Instance != null)
         {
@@ -60,8 +59,9 @@ public class UI_ReadyScreen : NetworkBehaviour
                 _playerItems.Add(player, item);
             }
         }
-        Debug.Log("menu dict countt: " + Host.PlayerManager.Instance.GetPlayerList().Count);
+
         CheckPlayersReady();
+        RPC_Update();
 
     }
 
@@ -85,6 +85,7 @@ public class UI_ReadyScreen : NetworkBehaviour
             Runner.Despawn(item.Object);
             _playerItems.Remove(player);
         }
+        RPC_Update();
     }
 
     private void joined(PlayerRef player)
@@ -108,6 +109,8 @@ public class UI_ReadyScreen : NetworkBehaviour
             item.Ready = false;
             _playerItems.Add(player, item);
         }
+
+        RPC_Update();
     }
 
     #region Menu
@@ -179,9 +182,18 @@ public class UI_ReadyScreen : NetworkBehaviour
             OnPlayersReady?.Invoke();
             
     }
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_Update()
+    {
+        if (Host.Player.Local != null)
+        {
+            _playerName.text = Host.Player.Local.View.PlayerName;
+        }
+        _readyLeft.text = $"players ready: {ReadyPlayersCount} / {Mathf.Max(_playerItems.Count, 2)}";
+    }
 
     void OnReadyPlayersRender()
     {
-        _readyLeft.text = $"players ready: {ReadyPlayersCount} / {_playerItems.Count}";
+        _readyLeft.text = $"players ready: {ReadyPlayersCount} / {Mathf.Max(_playerItems.Count, 2)}";
     }
 }
