@@ -3,7 +3,7 @@ using UnityEngine;
 using System;
 using UnityEngine.UI;
 
-public class UI_CarMEnu : MonoBehaviour
+public class UI_CarMenu : MonoBehaviour
 {
     [SerializeField] CarModels _models;
     [SerializeField] Transform _grid;

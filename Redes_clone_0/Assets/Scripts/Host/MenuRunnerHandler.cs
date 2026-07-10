@@ -16,7 +16,7 @@ namespace Host
         public event Action OnLobbyFound;
 
         //[SerializeField] private NetworkPrefabRef _playerPrefab;
-        //private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+        //private Dictionary<PlayerRef, NetworkObject> _activePlayers = new Dictionary<PlayerRef, NetworkObject>();
 
         HostInputHandler _inputHandler;
 
@@ -83,16 +83,16 @@ namespace Host
             //    Vector3 spawnPosition = new Vector3((player.RawEncoded % runner.Config.Simulation.PlayerCount) * 3, 1, 0);
             //    NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
             //    // Keep track of the player avatars for easy access
-            //    _spawnedCharacters.Add(player, networkPlayerObject);
+            //    _activePlayers.Add(player, networkPlayerObject);
             //}
         }
 
         void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            //if (_spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
+            //if (_activePlayers.TryGetValue(player, out NetworkObject networkObject))
             //{
             //    runner.Despawn(networkObject);
-            //    _spawnedCharacters.Remove(player);
+            //    _activePlayers.Remove(player);
             //}
         }
         void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)

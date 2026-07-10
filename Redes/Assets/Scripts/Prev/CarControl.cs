@@ -48,7 +48,7 @@ public class CarControl : MonoBehaviour
         // (the car steers more gently at top speed)
         float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, speedFactor);
 
-        // Check whether the user input is in the same direction 
+        // joined whether the user input is in the same direction 
         // as the car's velocity
         bool isAccelerating = Mathf.Sign(vInput) == Mathf.Sign(forwardSpeed);
 

@@ -1,17 +1,18 @@
 ﻿using Fusion;
 using Fusion.Sockets;
-using Host;
-using Redes;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Host
 { 
-    public class PlayerManager : SimulationBehaviour, INetworkRunnerCallbacks
+    public class PlayerManager : NetworkBehaviour, INetworkRunnerCallbacks
     {
+        public static Action<PlayerRef> OnPlayerJoined;
+        public static Action<PlayerRef> OnPlayerLeft;
+
         [SerializeField] private NetworkPrefabRef _playerPrefab;
-        private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+        private Dictionary<PlayerRef, PlayerManagerData> _activePlayers = new();
 
         public static PlayerManager Instance { get; private set; }
         HostInputHandler _inputHandler;
@@ -21,20 +22,18 @@ namespace Host
         {
             if (runner.IsServer)
             {
-                // Create a unique position for the player
-                Vector3 spawnPosition = new Vector3((player.RawEncoded % runner.Config.Simulation.PlayerCount) * 3, 1, 0);
-                NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
-                // Keep track of the player avatars for easy access
-                _spawnedCharacters.Add(player, networkPlayerObject);
+                _activePlayers.Add(player, new());
+                OnPlayerJoined?.Invoke(player);
             }
         }
 
         void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            if (_spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
+            if (_activePlayers.TryGetValue(player, out var data))
             {
-                runner.Despawn(networkObject);
-                _spawnedCharacters.Remove(player);
+                runner.Despawn(data.PlayerObj.Object);
+                _activePlayers.Remove(player);
+                OnPlayerLeft?.Invoke(player);
             }
         }
         void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)
@@ -42,6 +41,44 @@ namespace Host
             input.Set(_inputHandler.GetData());
         }
 
+        [Rpc(RpcSources.StateAuthority, RpcTargets.StateAuthority)]
+        public void RPC_Spawn(PlayerRef player)
+        {
+            if (!_activePlayers.TryGetValue(player, out var pData)) return;
+
+            pData.PlayerObj = Runner.Spawn(_playerPrefab, Vector3.zero, Quaternion.identity, player).GetComponent<Player>();
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.StateAuthority)]
+        public void RPC_SetPlayerName(PlayerRef player, string name)
+        {
+            if (_activePlayers.ContainsKey(player))
+            {
+                _activePlayers[player].Name = name;
+            }
+        }
+        [Rpc(RpcSources.StateAuthority, RpcTargets.StateAuthority)]
+        public void RPC_SetPlayerCar(PlayerRef player, int carIndex)
+        {
+            if (_activePlayers.ContainsKey(player))
+            {
+                _activePlayers[player].CarModel = carIndex;
+            }
+        }
+        [Rpc(RpcSources.StateAuthority, RpcTargets.StateAuthority)]
+        public void RPC_SetPlayerColor(PlayerRef player, Color color)
+        {
+            if (_activePlayers.ContainsKey(player))
+            {
+                _activePlayers[player].CarColor = color;
+            }
+        }
+        public Dictionary<PlayerRef, PlayerManagerData> GetPlayerList()
+        {
+            return _activePlayers;
+        }
+
+        #region MonoBehaviour
         private void Start()
         {
             if (Instance == null)
@@ -55,7 +92,7 @@ namespace Host
         {
             _inputHandler.UpdateInputs();
         }
-
+        #endregion
         #region Network Runner Callbacks
         void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
         {
@@ -79,5 +116,13 @@ namespace Host
         void INetworkRunnerCallbacks.OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
 
         #endregion
+    }
+
+    public class PlayerManagerData
+    {
+        public string Name { get; set; }
+        public int CarModel { get; set; }
+        public Color CarColor { get; set; }
+        public Player PlayerObj { get; set; }
     }
 }

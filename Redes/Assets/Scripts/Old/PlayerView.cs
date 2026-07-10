@@ -84,7 +84,7 @@ namespace Redes
             PlayerName = config.name;
             CarColor = config.color;
 
-            //RPC_SetCarModel(config.carModelIndex);
+            //RPC_CarModel(config.carModelIndex);
             //RPC_SetCarColor(config.color);
             //RPC_SetTagName(config.name);
         }
