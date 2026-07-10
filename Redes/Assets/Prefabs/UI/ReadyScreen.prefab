@@ -160,7 +160,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: roloestuvoaquiaa
+  m_text: waiting players
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 48c9cab8633f9404c9dea86cb99d33de, type: 2}
   m_sharedMaterial: {fileID: -1795760033626406641, guid: 48c9cab8633f9404c9dea86cb99d33de, type: 2}

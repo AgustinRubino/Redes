@@ -47,7 +47,7 @@ namespace Host
             if (_activePlayers.TryGetValue(player, out var data))
             {
                 Debug.Log($"Player Left: {player}");
-                runner.Despawn(data.PlayerObj.Object);
+                if (data.PlayerObj != null) runner.Despawn(data.PlayerObj.Object);
                 _activePlayers.Remove(player);
                 RPC_PlayerLeft(player);
             }

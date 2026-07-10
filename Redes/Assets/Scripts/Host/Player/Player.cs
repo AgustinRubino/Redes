@@ -18,6 +18,7 @@ namespace Host
 
         NetworkRigidbody3D _rb;
         public Rigidbody Body => _rb.Rigidbody;
+        public PlayerView View => _view;
         public static Player Local { get; private set; }
 
         #region Network Behaviour Methods
@@ -48,6 +49,7 @@ namespace Host
         public void SetView(PlayerView view)
         {
             _view = view;
+            _view.transform.parent = transform;
         }
         public void CanMove(bool move)
         {

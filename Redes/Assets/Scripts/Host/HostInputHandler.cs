@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
-using static UnityEditor.Searcher.SearcherWindow.Alignment;
 
 namespace Host
 {

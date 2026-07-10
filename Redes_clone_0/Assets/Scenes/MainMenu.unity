@@ -980,7 +980,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &882629392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1460,6 +1460,22 @@ PrefabInstance:
     - target: {fileID: 7722839619335434520, guid: be87e178abe7667429a4a1f63a43b675, type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7940476049262437947, guid: be87e178abe7667429a4a1f63a43b675, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7940476049262437947, guid: be87e178abe7667429a4a1f63a43b675, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7940476049262437947, guid: be87e178abe7667429a4a1f63a43b675, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8424022140659098232, guid: be87e178abe7667429a4a1f63a43b675, type: 3}
+      propertyPath: m_text
+      value: DECELERATE
       objectReference: {fileID: 0}
     - target: {fileID: 8425132998855057092, guid: be87e178abe7667429a4a1f63a43b675, type: 3}
       propertyPath: m_Name
