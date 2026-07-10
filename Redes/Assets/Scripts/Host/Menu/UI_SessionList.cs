@@ -53,11 +53,6 @@ public class UI_SessionList : MonoBehaviour
         _statusText.text = "no sessions found";
     }
 
-    private void NotFound()
-    {
-        _findingText.SetActive(false);
-        _statusText.text = "Couldn't Find Any Lobby";
-    }
     void ReceiveSessionList(List<SessionInfo> sessionList)
     {
         if (sessionList.Count == 0)
@@ -65,6 +60,7 @@ public class UI_SessionList : MonoBehaviour
             _statusText.gameObject.SetActive(true);
             return;
         }
+        _statusText.gameObject.SetActive(false);
 
         foreach (var sessionInfo in sessionList)
         {

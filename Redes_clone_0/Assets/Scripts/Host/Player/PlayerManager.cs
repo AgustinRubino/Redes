@@ -1,5 +1,6 @@
 ﻿using Fusion;
 using Fusion.Sockets;
+using Host;
 using Redes;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,9 @@ namespace Host
         [SerializeField] private NetworkPrefabRef _playerPrefab;
         private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
+        public static PlayerManager Instance { get; private set; }
         HostInputHandler _inputHandler;
+
 
         void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
@@ -36,25 +39,15 @@ namespace Host
         }
         void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)
         {
-            //var data = new InputData();
-
-            //if (Input.GetKey(KeyCode.W))
-            //    data.forward += 1;
-            //if (Input.GetKey(KeyCode.S))
-            //    data.forward -= 1;
-            //if (Input.GetKey(KeyCode.D))
-            //    data.right += 1;
-            //if (Input.GetKey(KeyCode.A))
-            //    data.right -= 1;
-
-            //data.Buttons.Set(InputData.MouseButton0, _mouseButton0);
-            //_mouseButton0 = false;
-
             input.Set(_inputHandler.GetData());
         }
 
         private void Start()
         {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
             _inputHandler = new HostInputHandler();
         }
 

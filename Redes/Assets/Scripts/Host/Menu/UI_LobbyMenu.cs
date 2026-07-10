@@ -8,6 +8,7 @@ public class UI_LobbyMenu : MonoBehaviour
     [SerializeField] GameObject _userDataMenu;
     [SerializeField] GameObject _findLobbyMenu;
     [SerializeField] GameObject _createLobbyMenu;
+    [SerializeField] GameObject _loadingMenu;
     //[SerializeField] GameObject _joinningLobbyMenu;
 
     public MenuRunnerHandler RunnerHandler => _runnerHandler;
@@ -36,7 +37,7 @@ public class UI_LobbyMenu : MonoBehaviour
         _userDataMenu.SetActive(false);
         _findLobbyMenu.SetActive(false);
         _createLobbyMenu.SetActive(false);
-       // _joinningLobbyMenu.SetActive(false);
+        _loadingMenu.SetActive(false);
     }
 
 
@@ -52,9 +53,10 @@ public class UI_LobbyMenu : MonoBehaviour
         CloseAll();
         _createLobbyMenu.SetActive(true);
     }
-    //public void OpenJoin() {
-    //    CloseAll();
-    //    _joinningLobbyMenu.SetActive(true);
-    //}
+    public void LoadingScreen()
+    {
+        CloseAll();
+        _loadingMenu.SetActive(true);
+    }
 
 }
