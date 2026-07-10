@@ -1,5 +1,6 @@
 ﻿using Fusion;
 using Fusion.Sockets;
+using Redes;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,7 +13,10 @@ namespace Host
         public static Action<PlayerRef> OnPlayerLeft;
 
         [SerializeField] private NetworkPrefabRef _playerPrefab;
+        [SerializeField] private PlayerView _playerViewPrefab;
         private Dictionary<PlayerRef, PlayerManagerData> _activePlayers = new();
+        [SerializeField] CarModels _models;
+        [SerializeField] Transform[] _startPositions;
 
         public static PlayerManager Instance { get; private set; }
         HostInputHandler _inputHandler;
@@ -40,15 +44,37 @@ namespace Host
         {
             input.Set(_inputHandler.GetData());
         }
+        [Rpc(RpcSources.StateAuthority, RpcTargets.StateAuthority)]
+        public void RPC_SpawnAll()
+        {
+            foreach (var (player, data) in _activePlayers)
+            {
+                RPC_Spawn(player);
+            }
+        }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.StateAuthority)]
         public void RPC_Spawn(PlayerRef player)
         {
             if (!_activePlayers.TryGetValue(player, out var pData)) return;
 
-            pData.PlayerObj = Runner.Spawn(_playerPrefab, Vector3.zero, Quaternion.identity, player).GetComponent<Player>();
+            var pos = _startPositions[player.AsIndex].position;
+            var rot = _startPositions[player.AsIndex].rotation;
+
+            pData.PlayerObj = Runner.Spawn(_playerPrefab, pos, rot, player).GetComponent<Player>();
+
+            SetView(player, pData);
+        }
+        public void SetView(PlayerRef player, PlayerManagerData data)
+        {
+            var view = Runner.Spawn(_playerViewPrefab, Vector3.zero, Quaternion.identity, player);
+            view.transform.SetParent(_activePlayers[player].PlayerObj.transform);
+            view.CarModelIndex = data.CarModel;
+            view.CarColor = data.CarColor;
+            view.PlayerName = data.Name;
         }
 
+        #region Data Setter
         [Rpc(RpcSources.StateAuthority, RpcTargets.StateAuthority)]
         public void RPC_SetPlayerName(PlayerRef player, string name)
         {
@@ -73,9 +99,18 @@ namespace Host
                 _activePlayers[player].CarColor = color;
             }
         }
+        #endregion
         public Dictionary<PlayerRef, PlayerManagerData> GetPlayerList()
         {
             return _activePlayers;
+        }
+
+        public void ForEach(Action<PlayerRef, PlayerManagerData> action)
+        {
+            foreach(var (player, data) in _activePlayers)
+            {
+                action(player, data);
+            }
         }
 
         #region MonoBehaviour

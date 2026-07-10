@@ -6,53 +6,50 @@ using UnityEngine;
 public class UI_Countdown : MonoBehaviour
 {
     [SerializeField] TMP_Text _text;
-    [SerializeField] float initScale = 3;
-    [SerializeField] float targetScale = 1;
-    [SerializeField] float duration = 0.2f;
-
+    [SerializeField] int _maxBound = 5;
+    [SerializeField] Vector2 _scaleSize;
+    [SerializeField] AnimationCurve _alphaCurve;
+    [SerializeField] AnimationCurve _sizeLerpCurve;
     Coroutine _routine;
 
     private void OnEnable()
     {
-        GameManager.Instance.startCounter.OnCounterChange += SetNumber;
+        Host.GameManager.OnCounter += SetNumber;
+        _text.gameObject.SetActive( false );
     }
 
     private void OnDisable()
     {
         if ( _routine != null )
             StopCoroutine( _routine );
+        Host.GameManager.OnCounter -= SetNumber;
     }
 
-    private void SetNumber(int obj)
+    public void SetNumber(int num)
     {
-        Debug.Log("number sent to UI: " + obj);
-        bool end = obj <= 0;
-        _text.text = end ? "GO!" : obj.ToString();
+        Debug.Log("number sent to UI: " + num);
+        if (num > _maxBound) return;
+
+        if (!_text.gameObject.activeSelf) _text.gameObject.SetActive(true);
+        _text.text = num <= 0 ? "GO!" : num.ToString();
         if (_routine != null)
             StopCoroutine(_routine);
-        _routine = StartCoroutine(ChangeSize(end));
+        _routine = StartCoroutine(ChangeSize());
     }
 
-    IEnumerator ChangeSize(bool end)
+    IEnumerator ChangeSize()
     {
         float t = 0;
-        float mult = 1 / duration;
-        while (t < duration)
+        while (t < 1)
         {
-            transform.localScale = Vector3.one * Mathf.Lerp(initScale, targetScale, t);
-            t += Time.deltaTime * mult;
+            transform.localScale = Vector3.one * Mathf.Lerp(_scaleSize.x, _scaleSize.y, _sizeLerpCurve.Evaluate(t));
+            _text.alpha = _alphaCurve.Evaluate(t);
+            t += Time.deltaTime;
             yield return null;
         }
-        transform.localScale = Vector3.one * targetScale;
-
-        if (!end)
-        {
-            _routine = null;
-            yield break;
-        }
-        GameManager.Instance.startCounter.OnCounterChange -= SetNumber;
-
-        yield return new WaitForSeconds(2);
-        transform.parent.gameObject.SetActive(false);
+        yield return new WaitForSeconds(1);
+        _text.gameObject.SetActive(false);
+        
+        _routine = null;
     }
 }
