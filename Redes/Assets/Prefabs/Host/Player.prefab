@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4337520341012221518
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2592913624745271391}
+  - component: {fileID: 255084817986658955}
+  - component: {fileID: 2863755585076699832}
+  m_Layer: 6
+  m_Name: Player
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2592913624745271391
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4337520341012221518}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &255084817986658955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4337520341012221518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9a5c9ef6cde94f47944b63ba64a12bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _canMove: 0
+  _view: {fileID: 0}
+  <Controller>k__BackingField:
+    maxSpeed: 80
+    _acceleration: 60
+    _deacceleration: 40
+    _breakForce: 75
+    _steerRotation: 0.1
+    _steeringForce: {x: 300, y: 30}
+    _gronud:
+      serializedVersion: 2
+      m_Bits: 0
+    _jumpForce: 100
+    _groundLayer:
+      serializedVersion: 2
+      m_Bits: 256
+    _dashForce: 350
+    _dashCooldown: 5
+    <Speed>k__BackingField: 0
+    <Steering>k__BackingField: 0
+    <CurrentRotation>k__BackingField: 0
+    <CurrentVelocity>k__BackingField: {x: 0, y: 0, z: 0}
+    <MoveDirection>k__BackingField: 0
+    <TargetVelocity>k__BackingField: {x: 0, y: 0, z: 0}
+    <DashTimer>k__BackingField: 0
+--- !u!114 &2863755585076699832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4337520341012221518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 93772986
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 255084817986658955}
+  ForceRemoteRenderTimeframe: 0

@@ -27,7 +27,6 @@ namespace Host
                 Local = this;
 
             _rb = GetComponent<NetworkRigidbody3D>();
-            _view = _view == null ? GetComponentInChildren<PlayerView>() : _view;
 
             _inputHandler = new();
             Controller.Set(this, _inputHandler);
@@ -46,11 +45,13 @@ namespace Host
         }
         #endregion
 
+        public void SetView(PlayerView view)
+        {
+            _view = view;
+        }
         public void CanMove(bool move)
         {
             _canMove = move;
         }
-
-
     }
 }

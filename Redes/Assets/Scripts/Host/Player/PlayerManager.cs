@@ -26,18 +26,30 @@ namespace Host
         {
             if (runner.IsServer)
             {
+                Debug.Log($"Player Joined: {player} to lobby");
                 _activePlayers.Add(player, new());
-                OnPlayerJoined?.Invoke(player);
+                RPC_PlayerJoined(player);
             }
+        }
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_PlayerJoined(PlayerRef player)
+        {
+            OnPlayerJoined?.Invoke(player);
+        }
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_PlayerLeft(PlayerRef player)
+        {
+            OnPlayerLeft?.Invoke(player);
         }
 
         void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
             if (_activePlayers.TryGetValue(player, out var data))
             {
+                Debug.Log($"Player Left: {player}");
                 runner.Despawn(data.PlayerObj.Object);
                 _activePlayers.Remove(player);
-                OnPlayerLeft?.Invoke(player);
+                RPC_PlayerLeft(player);
             }
         }
         void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)
@@ -72,6 +84,7 @@ namespace Host
             view.CarModelIndex = data.CarModel;
             view.CarColor = data.CarColor;
             view.PlayerName = data.Name;
+            _activePlayers[player].PlayerObj.SetView(view);
         }
 
         #region Data Setter
@@ -114,6 +127,16 @@ namespace Host
         }
 
         #region MonoBehaviour
+        public override void Spawned()
+        {
+            if (Runner.IsServer)
+            Runner.AddCallbacks(this);
+        }
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            if (Runner.IsServer)
+            Runner.RemoveCallbacks(this);
+        }
         private void Start()
         {
             if (Instance == null)

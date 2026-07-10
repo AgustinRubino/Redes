@@ -57,8 +57,6 @@ namespace Host
 
             if (!result.Ok)
             {
-                Debug.LogError($"[Custom Error] Unable to Join Lobby");
-
                 OnLobbyNotFound?.Invoke();
             }
             else
@@ -111,7 +109,7 @@ namespace Host
             //data.Buttons.Set(InputData.MouseButton0, _mouseButton0);
             //_mouseButton0 = false;
 
-            input.Set(_inputHandler.GetData());
+            //input.Set(_inputHandler.GetData());
         }
 
 

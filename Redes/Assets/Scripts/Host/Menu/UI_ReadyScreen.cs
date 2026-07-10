@@ -31,6 +31,7 @@ public class UI_ReadyScreen : NetworkBehaviour
     Dictionary<PlayerRef, UI_PlayerItem> _playerItems;
     public override void Spawned()
     {
+
         _readyBTN.onClick.AddListener(() => RPC_Ready(Runner.LocalPlayer));
         _quitBTN.onClick.AddListener(() => SceneManager.LoadScene(SceneIndex.MainMenu));
         _colorBTN.onClick.AddListener(OpenColorMenu);
@@ -38,6 +39,7 @@ public class UI_ReadyScreen : NetworkBehaviour
 
         if (!HasStateAuthority) return;
 
+        Debug.Log("Menu opened");
         _playerItems = new();
 
         if(Host.PlayerManager.Instance != null)
@@ -45,7 +47,12 @@ public class UI_ReadyScreen : NetworkBehaviour
             foreach (var (player, data) in Host.PlayerManager.Instance.GetPlayerList())
             {
                 var item = Runner.Spawn(_prefab, Vector3.zero, Quaternion.identity);
-                item.GetComponent<NetworkTransform>().transform.parent = _grid;
+                var trans = item.GetComponent<NetworkTransform>().transform;
+                trans.parent = _grid;
+                trans.localPosition = Vector3.zero;
+                trans.localScale = Vector3.zero;
+                trans.localRotation = Quaternion.identity;
+
                 item.Name = data.Name;
                 item.Car = _carModels.Models[data.CarModel].name;
                 item.Color = data.CarColor;
@@ -53,6 +60,7 @@ public class UI_ReadyScreen : NetworkBehaviour
                 _playerItems.Add(player, item);
             }
         }
+        Debug.Log("menu dict countt: " + Host.PlayerManager.Instance.GetPlayerList().Count);
         CheckPlayersReady();
 
     }
@@ -83,10 +91,15 @@ public class UI_ReadyScreen : NetworkBehaviour
     {
         if (!Runner.IsServer) return;
 
+        Debug.Log("added player: " + player);
         if (!_playerItems.ContainsKey(player))
         {
             var item = Runner.Spawn(_prefab, Vector3.zero, Quaternion.identity);
-            item.GetComponent<NetworkTransform>().transform.parent = _grid;
+            var trans = item.GetComponent<NetworkTransform>().transform;
+            trans.parent = _grid;
+            trans.localPosition = Vector3.zero;
+            trans.localScale = Vector3.one;
+            trans.localRotation = Quaternion.identity;
 
             var data = Host.PlayerManager.Instance.GetPlayerList()[player];
             item.Name = data.Name;
@@ -161,6 +174,7 @@ public class UI_ReadyScreen : NetworkBehaviour
         }
         ReadyPlayersCount = counter;
 
+        if (counter < 2) return;
         if (counter >= _playerItems.Count)
             OnPlayersReady?.Invoke();
             

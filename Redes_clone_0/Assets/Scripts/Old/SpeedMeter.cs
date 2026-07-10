@@ -1,15 +1,16 @@
+using Host;
 using TMPro;
 using UnityEngine;
 
 public class SpeedMeter : MonoBehaviour
 {
     [SerializeField] TMP_Text _text;
-    ForceMovement _movement;
+    PlayerController _movement;
 
 
     private void OnEnable()
     {
-        _movement = SingletonManager.Instance.Player.movement;
+        _movement = Host.Player.Local.Controller;
     }
 
     private void FixedUpdate()
