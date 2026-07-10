@@ -7,13 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Skybox
-  m_Shader: {fileID: -6465566751694194690, guid: 15ba28492434403438e04270fe8521c7, type: 3}
+  m_Name: SG-TRE 2
+  m_Shader: {fileID: -6465566751694194690, guid: 37503f2f8b8a42248a9730e70bd8e73d, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 4
+  m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -24,6 +24,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 00112bc61a1c1004fadc86fee649dc47, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -38,14 +42,17 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _DesidadDelAire: 0.06
+    - _FuerzaDeViento: 0.3
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - _Bottom_color: {r: 0.6509434, g: 0.8547742, b: 0.8679245, a: 0}
-    - _Top_color: {r: 0, g: 0.5863712, b: 0.6226415, a: 0}
+    - _Color1: {r: 0.024843989, g: 0.4339623, b: 0, a: 0}
+    - _Color2: {r: 0.5754717, g: 0.5313474, b: 0.09500711, a: 0}
+    - _MovimientoDeVrisa: {r: 6, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &8318616752003007902
+--- !u!114 &5921286678223031312
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
