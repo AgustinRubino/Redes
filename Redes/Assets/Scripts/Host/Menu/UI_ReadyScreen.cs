@@ -25,7 +25,7 @@ public class UI_ReadyScreen : NetworkBehaviour
     [SerializeField] TMP_Text _readyLeft;
     [SerializeField] Transform _grid;
     [SerializeField] CarModels _carModels;
-
+    [SerializeField] GameObject WaitScreen;
     [Networked, OnChangedRender(nameof(OnReadyPlayersRender))] public int ReadyPlayersCount { get; set; }
 
     Dictionary<PlayerRef, UI_PlayerItem> _playerItems;
@@ -178,10 +178,20 @@ public class UI_ReadyScreen : NetworkBehaviour
         ReadyPlayersCount = counter;
 
         if (counter < 2) return;
-        if (counter >= _playerItems.Count)
+        if (counter >= _playerItems.Count) 
+        {
             OnPlayersReady?.Invoke();
+            RPC_WaitScreenDesable();
+        }
             
     }
+
+    [Rpc]
+    public void RPC_WaitScreenDesable()
+    {
+        WaitScreen.gameObject.SetActive(false);
+    }
+
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_Update()
     {

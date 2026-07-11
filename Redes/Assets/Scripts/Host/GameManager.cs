@@ -42,11 +42,12 @@ namespace Host
                 _waitMenu.transform.localPosition = Vector3.zero;
                 _waitMenu.transform.localRotation = Quaternion.identity;
                 _waitMenu.transform.localScale = Vector3.one;
-                _waitMenu.OnPlayersReady += OnPlayersReady;
+                _waitMenu.OnPlayersReady += RPC_OnPlayersReady;
             }
         }
 
-        private void OnPlayersReady()
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_OnPlayersReady()
         {
             PlayerManager.Instance.RPC_SpawnAll();
             _startCamera.SetActive(false);

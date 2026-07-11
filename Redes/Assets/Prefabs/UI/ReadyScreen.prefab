@@ -578,6 +578,7 @@ MonoBehaviour:
   _readyLeft: {fileID: 4878363581887275364}
   _grid: {fileID: 5941356956376236823}
   _carModels: {fileID: 11400000, guid: c930139e0efc4a9468c5d5a422a93aba, type: 2}
+  WaitScreen: {fileID: 2761177403061269956}
   _ReadyPlayersCount: 0
 --- !u!114 &3722151963177803648
 MonoBehaviour:

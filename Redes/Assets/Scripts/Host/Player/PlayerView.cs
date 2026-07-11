@@ -11,9 +11,9 @@ namespace Host
 
         #region Model Variables
         [Header("NETWORKED FIELDS")]
-        [Networked, OnChangedRender(nameof(CarModelRender))] public int CarModelIndex { get; set; }
-        [Networked, OnChangedRender(nameof(CarColorRender))] public Color CarColor { get; set; }
-        [Networked, OnChangedRender(nameof(CarNameRender))] public string PlayerName { get; set; }
+        [Networked, OnChangedRender(nameof(RPC_CarModelRender))] public int CarModelIndex { get; set; }
+        [Networked, OnChangedRender(nameof(RPC_CarColorRender))] public Color CarColor { get; set; }
+        [Networked, OnChangedRender(nameof(RPC_CarNameRender))] public string PlayerName { get; set; }
         [Space(10)]
         [SerializeField] CarModels _models;
         [SerializeField] GameObject _carModel;
@@ -46,15 +46,20 @@ namespace Host
             _engineAudio.Play();
             //_player.Controller.OnDashed += Dashed;
             //_player.Controller.OnJumped += Jumped;
+            RPC_CarModelRender();
+            RPC_CarColorRender();
+            RPC_CarNameRender();
         }
 
         #region Init
-        void CarModelRender()
+        [Rpc]
+        void RPC_CarModelRender()
         {
             if (_carModel != null) Destroy(_carModel);
             _carModel = Instantiate(_models.Models[CarModelIndex], transform);
         }
-        void CarColorRender()
+        [Rpc]
+        void RPC_CarColorRender()
         {
             _renderer = _carModel.GetComponent<MeshRenderer>();
             if (_renderer == null)
@@ -62,7 +67,8 @@ namespace Host
 
             _renderer.material.color = CarColor;
         }
-        void CarNameRender()
+        [Rpc]
+        void RPC_CarNameRender()
         {
             _playerNameTagTxt.text = PlayerName;
             Object.name = PlayerName;
